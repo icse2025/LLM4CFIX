@@ -1,0 +1,26 @@
+ChangeLog:1@DiningPhilosophers.java
+FixDescription: Change the locking order to ensure all philosophers pick up the lower numbered fork first and then the higher one to prevent deadlock.
+OriginalCode@14-17:
+```java
+[14] 			if (i==0)
+[15] 				phils[i] = new Philosopher(forks[num-1],forks[i]);
+[16] 			else
+[17] 				phils[i] = new Philosopher(forks[i-1],forks[i]);
+```
+FixedCode@14-17:
+```java
+[14] 			if (i == 0)
+[15] 				phils[i] = new Philosopher(forks[i], forks[num - 1]);
+[16] 			else
+[17] 				phils[i] = new Philosopher(forks[i - 1], forks[i]);
+```
+OriginalCode@32-33:
+```java
+[32]             synchronized (rightFork) {
+[33]                 synchronized (leftFork) {
+```
+FixedCode@32-33:
+```java
+[32]             synchronized (leftFork) {
+[33]                 synchronized (rightFork) {
+```

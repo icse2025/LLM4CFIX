@@ -1,0 +1,4 @@
+linkedlist.MyLinkedList.insert(Ljava/lang/Object;Llinkedlist/MyLinkedListItr;)V
+linkedlist.MyListBuilder.run()V
+linkedlist.MyLinkedList.addLast(Ljava/lang/Object;)V
+linkedlist.BugTester.main([Ljava/lang/String;)V

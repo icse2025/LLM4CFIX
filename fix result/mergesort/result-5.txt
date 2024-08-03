@@ -1,0 +1,64 @@
+ChangeLog:1@MergeSort.java
+FixDescription: Ensure the main method does not overwrite the command-line arguments, which should be passed to the program. This fix restores the intended functionality of reading file name and concurrency level from the command line.
+OriginalCode@9-14:
+[9]         args = new String[2];
+[10]         args[0] = "output.txt";
+[11]         args[1] = "little";
+[12]         fileName = args[0];
+[13]         conCur = args[1];
+[14]         String concurrency;
+FixedCode@9-12:
+[9]         if (args.length < 2) {
+[10]             System.out.println("Usage: java MergeSort <output file> <concurrency level>");
+[11]             System.exit(1);
+[12]         }
+[13]         fileName = args[0];
+[14]         conCur = args[1];
+
+ChangeLog:2@MSort.java
+FixDescription: Add synchronization to methods that modify shared variables related to thread management to prevent race conditions.
+OriginalCode@57-61:
+[57]                 DecreaseThreadCounter();
+[58]                 rightSon.Sorting();
+[59]                 try {
+[60]                     leftSon.join();
+[61]                     IncreaseThreadCounter();
+FixedCode@57-61:
+[57]                 synchronized (MSort.class) {
+[58]                     DecreaseThreadCounter();
+[59]                 }
+[60]                 rightSon.Sorting();
+[61]                 try {
+[62]                     leftSon.join();
+[63]                     synchronized (MSort.class) {
+[64]                         IncreaseThreadCounter();
+[65]                     }
+[66]                 } catch (InterruptedException r)
+
+OriginalCode@71-78:
+[71]                 DecreaseThreadCounter();
+[72]                 rightSon.start();
+[73]                 DecreaseThreadCounter();
+[74]                 try {
+[75]                     leftSon.join();
+[76]                     IncreaseThreadCounter();
+[77]                     rightSon.join();
+[78]                     IncreaseThreadCounter();
+FixedCode@71-78:
+[71]                 synchronized (MSort.class) {
+[72]                     DecreaseThreadCounter();
+[73]                 }
+[74]                 rightSon.start();
+[75]                 synchronized (MSort.class) {
+[76]                     DecreaseThreadCounter();
+[77]                 }
+[78]                 try {
+[79]                     leftSon.join();
+[80]                     synchronized (MSort.class) {
+[81]                         IncreaseThreadCounter();
+[82]                     }
+[83]                     rightSon.join();
+[84]                     synchronized (MSort.class) {
+[85]                         IncreaseThreadCounter();
+[86]                     }
+[87]                 } catch (InterruptedException r)

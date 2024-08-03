@@ -1,0 +1,444 @@
+package hashcodetest;
+public class HashCodeTest {
+    public static void main(String[] args) {
+        HashCodeTest h = new HashCodeTest();
+        try {
+            h.testHashCode();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    final static int TEST_LENGTH = 1;
+    final static int NUM_OF_THREADS = 10;
+    public void testHashCode() throws InterruptedException {
+        IntRange rangeArrayA[] = new IntRange[TEST_LENGTH];
+        for (int i = 0; i < TEST_LENGTH; i++) {
+            rangeArrayA[i] = new IntRange(i); 
+        }
+        hashThread[] h = new hashThread[NUM_OF_THREADS]; 
+        for (int i = 0; i < NUM_OF_THREADS; i++) { 
+            h[i] = new hashThread(rangeArrayA); 
+        }
+        for (int i = 0; i < NUM_OF_THREADS; i++) { 
+            h[i].start(); 
+        }
+        for (int i = 0; i < NUM_OF_THREADS; i++) {
+            h[i].join();
+        }
+        for (int i = 0; i < TEST_LENGTH; i++) {
+            for (int j = 0; j < NUM_OF_THREADS - 1; j++) {
+                assert(h[j].hash[i] == h[j + 1].hash[i]);
+            }
+        }
+    }
+    class hashThread extends Thread {
+		IntRange[] t = new IntRange[TEST_LENGTH];
+        public int[] hash;
+//...
+        public void run() {
+            hash = new int[t.length];
+            for (int i = 0; i < t.length; i++) {
+                hash[i] = t[i].hashCode();
+            }
+        }
+    }
+}package hashcodetest;
+import java.io.Serializable;
+public final class IntRange extends Range implements Serializable {
+    private static final long serialVersionUID = 71849363892730L;
+    private final int min;
+    private final int max;
+    private transient Integer minObject = null;
+    private transient Integer maxObject = null;
+    private transient int hashCode = 0;
+    private transient String toString = null;
+    public IntRange(int number) {
+        super();
+        this.min = number;
+        this.max = number;
+    }
+    public IntRange(Number number) {
+        super();
+        if (number == null) {
+            throw new IllegalArgumentException("The number must not be null");
+        }
+        this.min = number.intValue();
+        this.max = number.intValue();
+        if (number instanceof Integer) {
+            this.minObject = (Integer) number;
+            this.maxObject = (Integer) number;
+        }
+    }
+    public IntRange(int number1, int number2) {
+        super();
+        if (number2 < number1) {
+            this.min = number2;
+            this.max = number1;
+        } else {
+            this.min = number1;
+            this.max = number2;
+        }
+    }
+//...
+    public int hashCode() {
+        if (hashCode == 0) {
+            hashCode = 17;
+            hashCode = 37 * hashCode + getClass().hashCode();
+        }
+        return hashCode;
+    }
+}package hashcodetest;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+public class NumberUtils {
+    public static final Long LONG_ZERO = new Long(0L);
+    public static final Long LONG_ONE = new Long(1L);
+    public static final Long LONG_MINUS_ONE = new Long(-1L);
+    public static final Integer INTEGER_ZERO = new Integer(0);
+    public static final Integer INTEGER_ONE = new Integer(1);
+    public static final Integer INTEGER_MINUS_ONE = new Integer(-1);
+    public static final Short SHORT_ZERO = new Short((short) 0);
+    public static final Short SHORT_ONE = new Short((short) 1);
+    public static final Short SHORT_MINUS_ONE = new Short((short) -1);
+    public static final Byte BYTE_ZERO = new Byte((byte) 0);
+    public static final Byte BYTE_ONE = new Byte((byte) 1);
+    public static final Byte BYTE_MINUS_ONE = new Byte((byte) -1);
+    public static final Double DOUBLE_ZERO = new Double(0.0d);
+    public static final Double DOUBLE_ONE = new Double(1.0d);
+    public static final Double DOUBLE_MINUS_ONE = new Double(-1.0d);
+    public static final Float FLOAT_ZERO = new Float(0.0f);
+    public static final Float FLOAT_ONE = new Float(1.0f);
+    public static final Float FLOAT_MINUS_ONE = new Float(-1.0f);
+//...
+    public static int stringToInt(String str) {
+        return toInt(str);
+    }
+    public static int toInt(String str) {
+        return toInt(str, 0);
+    }
+    public static long toLong(String str) {
+        return toLong(str, 0L);
+    }
+    public static float toFloat(String str) {
+        return toFloat(str, 0.0f);
+    }
+    public static double toDouble(String str) {
+        return toDouble(str, 0.0d);
+    }
+    public static long min(long[] array) {
+        if (array == null) {
+            throw new IllegalArgumentException("The Array must not be null");
+        } else if (array.length == 0) {
+            throw new IllegalArgumentException("Array cannot be empty.");
+        }
+        long min = array[0];
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] < min) {
+                min = array[i];
+            }
+        }
+        return min;
+    }
+    public static int min(int[] array) {
+        if (array == null) {
+            throw new IllegalArgumentException("The Array must not be null");
+        } else if (array.length == 0) {
+            throw new IllegalArgumentException("Array cannot be empty.");
+        }
+        int min = array[0];
+        for (int j = 1; j < array.length; j++) {
+            if (array[j] < min) {
+                min = array[j];
+            }
+        }
+        return min;
+    }
+    public static short min(short[] array) {
+        if (array == null) {
+            throw new IllegalArgumentException("The Array must not be null");
+        } else if (array.length == 0) {
+            throw new IllegalArgumentException("Array cannot be empty.");
+        }
+        short min = array[0];
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] < min) {
+                min = array[i];
+            }
+        }
+        return min;
+    }
+    public static byte min(byte[] array) {
+        if (array == null) {
+            throw new IllegalArgumentException("The Array must not be null");
+        } else if (array.length == 0) {
+            throw new IllegalArgumentException("Array cannot be empty.");
+        }
+        byte min = array[0];
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] < min) {
+                min = array[i];
+            }
+        }
+        return min;
+    }
+    public static double min(double[] array) {
+        if (array == null) {
+            throw new IllegalArgumentException("The Array must not be null");
+        } else if (array.length == 0) {
+            throw new IllegalArgumentException("Array cannot be empty.");
+        }
+        double min = array[0];
+        for (int i = 1; i < array.length; i++) {
+            if (Double.isNaN(array[i])) {
+                return Double.NaN;
+            }
+            if (array[i] < min) {
+                min = array[i];
+            }
+        }
+        return min;
+    }
+    public static float min(float[] array) {
+        if (array == null) {
+            throw new IllegalArgumentException("The Array must not be null");
+        } else if (array.length == 0) {
+            throw new IllegalArgumentException("Array cannot be empty.");
+        }
+        float min = array[0];
+        for (int i = 1; i < array.length; i++) {
+            if (Float.isNaN(array[i])) {
+                return Float.NaN;
+            }
+            if (array[i] < min) {
+                min = array[i];
+            }
+        }
+        return min;
+    }
+    public static long max(long[] array) {
+        if (array == null) {
+            throw new IllegalArgumentException("The Array must not be null");
+        } else if (array.length == 0) {
+            throw new IllegalArgumentException("Array cannot be empty.");
+        }
+        long max = array[0];
+        for (int j = 1; j < array.length; j++) {
+            if (array[j] > max) {
+                max = array[j];
+            }
+        }
+        return max;
+    }
+    public static int max(int[] array) {
+        if (array == null) {
+            throw new IllegalArgumentException("The Array must not be null");
+        } else if (array.length == 0) {
+            throw new IllegalArgumentException("Array cannot be empty.");
+        }
+        int max = array[0];
+        for (int j = 1; j < array.length; j++) {
+            if (array[j] > max) {
+                max = array[j];
+            }
+        }
+        return max;
+    }
+    public static short max(short[] array) {
+        if (array == null) {
+            throw new IllegalArgumentException("The Array must not be null");
+        } else if (array.length == 0) {
+            throw new IllegalArgumentException("Array cannot be empty.");
+        }
+        short max = array[0];
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] > max) {
+                max = array[i];
+            }
+        }
+        return max;
+    }
+    public static byte max(byte[] array) {
+        if (array == null) {
+            throw new IllegalArgumentException("The Array must not be null");
+        } else if (array.length == 0) {
+            throw new IllegalArgumentException("Array cannot be empty.");
+        }
+        byte max = array[0];
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] > max) {
+                max = array[i];
+            }
+        }
+        return max;
+    }
+    public static double max(double[] array) {
+        if (array== null) {
+            throw new IllegalArgumentException("The Array must not be null");
+        } else if (array.length == 0) {
+            throw new IllegalArgumentException("Array cannot be empty.");
+        }
+        double max = array[0];
+        for (int j = 1; j < array.length; j++) {
+            if (Double.isNaN(array[j])) {
+                return Double.NaN;
+            }
+            if (array[j] > max) {
+                max = array[j];
+            }
+        }
+        return max;
+    }
+    public static float max(float[] array) {
+        if (array == null) {
+            throw new IllegalArgumentException("The Array must not be null");
+        } else if (array.length == 0) {
+            throw new IllegalArgumentException("Array cannot be empty.");
+        }
+        float max = array[0];
+        for (int j = 1; j < array.length; j++) {
+            if (Float.isNaN(array[j])) {
+                return Float.NaN;
+            }
+            if (array[j] > max) {
+                max = array[j];
+            }
+        }
+        return max;
+    }
+    public static long min(long a, long b, long c) {
+        if (b < a) {
+            a = b;
+        }
+        if (c < a) {
+            a = c;
+        }
+        return a;
+    }
+    public static int min(int a, int b, int c) {
+        if (b < a) {
+            a = b;
+        }
+        if (c < a) {
+            a = c;
+        }
+        return a;
+    }
+    public static short min(short a, short b, short c) {
+        if (b < a) {
+            a = b;
+        }
+        if (c < a) {
+            a = c;
+        }
+        return a;
+    }
+    public static byte min(byte a, byte b, byte c) {
+        if (b < a) {
+            a = b;
+        }
+        if (c < a) {
+            a = c;
+        }
+        return a;
+    }
+    public static double min(double a, double b, double c) {
+        return Math.min(Math.min(a, b), c);
+    }
+    public static long max(long a, long b, long c) {
+        if (b > a) {
+            a = b;
+        }
+        if (c > a) {
+            a = c;
+        }
+        return a;
+    }
+    public static int max(int a, int b, int c) {
+        if (b > a) {
+            a = b;
+        }
+        if (c > a) {
+            a = c;
+        }
+        return a;
+    }
+    public static short max(short a, short b, short c) {
+        if (b > a) {
+            a = b;
+        }
+        if (c > a) {
+            a = c;
+        }
+        return a;
+    }
+    public static byte max(byte a, byte b, byte c) {
+        if (b > a) {
+            a = b;
+        }
+        if (c > a) {
+            a = c;
+        }
+        return a;
+    }
+    public static double max(double a, double b, double c) {
+        return Math.max(Math.max(a, b), c);
+    }
+    public static int compare(double lhs, double rhs) {
+        if (lhs < rhs) {
+            return -1;
+        }
+        if (lhs > rhs) {
+            return +1;
+        }
+        long lhsBits = Double.doubleToLongBits(lhs);
+        long rhsBits = Double.doubleToLongBits(rhs);
+        if (lhsBits == rhsBits) {
+            return 0;
+        }
+        if (lhsBits < rhsBits) {
+            return -1;
+        } else {
+            return +1;
+        }
+    }
+    static class StringUtils {
+//...
+    }
+}package hashcodetest;
+public abstract class Range {
+//...
+    public abstract Number getMinimumNumber();
+    public abstract Number getMaximumNumber();
+    public abstract boolean containsNumber(Number number);
+    public boolean containsLong(Number value) {
+        if (value == null) {
+            return false;
+        }
+        return containsLong(value.longValue());
+    }
+    public boolean containsInteger(Number value) {
+        if (value == null) {
+            return false;
+        }
+        return containsInteger(value.intValue());
+    }
+    public boolean containsDouble(Number value) {
+        if (value == null) {
+            return false;
+        }
+        return containsDouble(value.doubleValue());
+    }
+    public boolean containsFloat(Number value) {
+        if (value == null) {
+            return false;
+        }
+        return containsFloat(value.floatValue());
+    }
+    public int hashCode() {
+        int result = 17;
+        result = 37 * result + getClass().hashCode();
+        result = 37 * result + getMinimumNumber().hashCode();
+        result = 37 * result + getMaximumNumber().hashCode();
+        return result;
+    }
+}

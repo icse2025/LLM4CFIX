@@ -1,0 +1,2 @@
+consisitency.Main.run()V
+consisitency.Main.main([Ljava/lang/String;)V

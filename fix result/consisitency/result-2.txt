@@ -1,0 +1,48 @@
+ChangeLog:1@Main.java
+FixDescription: Fixed concurrency bug by ensuring synchronized access to shared variables 'a' and 'b'.
+
+OriginalCode@9-10:
+[9]         a = num;
+[10]        b = num;
+
+FixedCode@9-10:
+[9]         synchronized (Main.class) {
+[10]            a = num;
+[11]            b = num;
+[12]        }
+
+ChangeLog:2@Main.java
+FixDescription: Ensured thread safety during variable initialization.
+
+OriginalCode@13-17:
+[13]        Thread[] t = new Thread[THREAD_NUMBER];
+[14]        for (int i = 0; i < THREAD_NUMBER; i++) {
+[15]            t[i] = new Thread(new Main(i));
+[16]            t[i].start();
+[17]        }
+
+FixedCode@13-17:
+[13]        Thread[] t = new Thread[THREAD_NUMBER];
+[14]        for (int i = 0; i < THREAD_NUMBER; i++) {
+[15]            t[i] = new Thread(new Main(i));
+[16]            synchronized (t[i]) {
+[17]                t[i].start();
+[18]            }
+[19]        }
+
+ChangeLog:3@Main.java
+FixDescription: Ensured proper synchronization and atomicity during variable comparison.
+
+OriginalCode@21-24:
+[21]        System.out.println("a = " + a + ", b = " + b);
+[22]        if (a != b) {
+[23]            throw new Exception("bug found.");
+[24]        }
+
+FixedCode@21-24:
+[21]        synchronized (Main.class) {
+[22]            System.out.println("a = " + a + ", b = " + b);
+[23]            if (a != b) {
+[24]                throw new Exception("bug found.");
+[25]            }
+[26]        }

@@ -1,0 +1,23 @@
+ChangeLog:1@EvenGenerator.java
+FixDescription: Ensured thread safety in `EvenGenerator` by synchronizing the `next()` method to prevent race conditions.
+
+OriginalCode@5-8:
+```java
+[5] 	public int next(){
+[6] 		++currentValue;
+[7] 		++currentValue;
+[8] 		return currentValue;
+```
+FixedCode@5-8:
+```java
+[5] 	public synchronized int next(){
+[6] 		++currentValue;
+[7] 		++currentValue;
+[8] 		return currentValue;
+```
+
+### Explanation:
+The `next()` method in `EvenGenerator` increments the `currentValue` twice to produce an even number. However, without synchronization, multiple threads could interleave these operations, leading to inconsistent states where `currentValue` might not be even. By adding the `synchronized` keyword to the `next()` method, we ensure that only one thread can execute this method at a time, maintaining the integrity of `currentValue`.
+
+### Summary:
+- Added `synchronized` to the `next()` method in `EvenGenerator` to ensure atomicity and prevent race conditions.

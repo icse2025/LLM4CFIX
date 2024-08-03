@@ -1,0 +1,15 @@
+ChangeLog:1@NestedMonitor.java
+FixDescription: Correct the order of semaphore operations in the put and get methods to prevent deadlocks and ensure proper synchronization between producers and consumers.
+OriginalCode@9-10:
+[9]         empty.down();
+[10]        full.up();
+FixedCode@9-10:
+[9]         full.down();
+[10]        empty.up();
+
+OriginalCode@14-15:
+[14]        full.down();
+[15]        empty.up();
+FixedCode@14-15:
+[14]        empty.down();
+[15]        full.up();

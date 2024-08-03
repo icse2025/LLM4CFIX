@@ -1,0 +1,20 @@
+ChangeLog:1@Account.java
+FixDescription: Ensure proper synchronization during transfer to avoid unprotected access to account amounts.
+OriginalCode@12-19:
+[12]   synchronized  void transfer(Account ac,double mn){
+[13]       amount-=mn;
+[14]       if (name.equals("D")) {
+[15] 	System.out.println("unprotected");
+[16]             ac.amount += mn;
+[17]       } else {
+[18] 	synchronized (ac) { ac.amount+=mn; }
+[19]       }
+FixedCode@12-19:
+[12]   void transfer(Account ac,double mn){
+[13]       synchronized (this) {
+[14]           amount -= mn;
+[15]       }
+[16]       synchronized (ac) {
+[17]           ac.amount += mn;
+[18]       }
+[19]   }

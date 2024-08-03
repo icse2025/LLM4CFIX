@@ -1,0 +1,33 @@
+result-2.txtChangeLog:1@BusinessAccount.java
+FixDescription: Ensure proper locking order in BusinessAccount to avoid potential deadlocks during transfers.
+OriginalCode@4-6:
+[4]     public synchronized void transfer(Account dest, int transferAmount){
+[5]         amount -= transferAmount;
+[6]         synchronized (dest) { dest.amount+=transferAmount; }
+FixedCode@4-7:
+[4]     public void transfer(Account dest, int transferAmount){
+[5]         Account first = this.number < dest.number ? this : dest;
+[6]         Account second = this.number < dest.number ? dest : this;
+[7]         synchronized (first) {
+[8]             synchronized (second) {
+[9]                 this.amount -= transferAmount;
+[10]                dest.amount += transferAmount;
+[11]            }
+[12]        }
+
+ChangeLog:2@PersonalAccount.java
+FixDescription: Ensure proper locking order in PersonalAccount to avoid potential deadlocks during transfers.
+OriginalCode@4-6:
+[4]     public synchronized void transfer(Account ac, int mn){
+[5]         amount-=mn;
+[6]         ac.amount+=mn;
+FixedCode@4-7:
+[4]     public void transfer(Account ac, int mn){
+[5]         Account first = this.number < ac.number ? this : ac;
+[6]         Account second = this.number < ac.number ? ac : this;
+[7]         synchronized (first) {
+[8]             synchronized (second) {
+[9]                 this.amount -= mn;
+[10]                ac.amount += mn;
+[11]            }
+[12]        }

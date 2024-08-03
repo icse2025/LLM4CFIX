@@ -1,0 +1,21 @@
+ChangeLog:1@BankAccount.java
+FixDescription: Synchronize the add method to prevent race conditions when multiple threads update the total simultaneously.
+OriginalCode@4-6:
+[4]     public void add(int n) {
+[5]         total += n;
+[6]     }
+FixedCode@4-6:
+[4]     public synchronized void add(int n) {
+[5]         total += n;
+[6]     }
+
+ChangeLog:2@BankAccount.java
+FixDescription: Synchronize the getTotal method to ensure visibility of the updated total across threads.
+OriginalCode@7-9:
+[7]     public int getTotal() {
+[8]         return total;
+[9]     }
+FixedCode@7-9:
+[7]     public synchronized int getTotal() {
+[8]         return total;
+[9]     }

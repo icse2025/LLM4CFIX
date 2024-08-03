@@ -1,0 +1,41 @@
+ChangeLog:1@TwoStage.java
+FixDescription: Ensure atomicity in the update and check of data1 and data2 values to prevent race conditions.
+OriginalCode@5-11:
+[5]     public void A () {
+[6]        synchronized (data1) {
+[7]            data1.value=1;
+[8]        }
+[9]        synchronized (data2) {       
+[10]            data2.value=data1.value+1;
+[11]        }
+FixedCode@5-11:
+[5]     public void A () {
+[6]        synchronized (this) {
+[7]            data1.value=1;
+[8]            data2.value=data1.value+1;
+[9]        }
+[10]        
+[11]        
+
+OriginalCode@14-23:
+[14]     public void B () {
+[15]     int t1=-1, t2=-1;
+[16]         synchronized (data1) {
+[17]         if (data1.value==0) return ; 
+[18]             t1=data1.value;
+[19]     }
+[20]     synchronized (data2) {
+[21]         t2=data2.value;
+[22]     }
+[23]         if (t2 != (t1+1))
+FixedCode@14-23:
+[14]     public void B () {
+[15]     int t1=-1, t2=-1;
+[16]         synchronized (this) {
+[17]         if (data1.value==0) return ; 
+[18]             t1=data1.value;
+[19]             t2=data2.value;
+[20]         }
+[21]         
+[22]         
+[23]         if (t2 != (t1+1))

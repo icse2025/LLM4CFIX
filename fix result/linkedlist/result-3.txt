@@ -1,0 +1,37 @@
+ChangeLog:1@MyLinkedList.java
+FixDescription: Fix atomicity violation in the insert method of MyLinkedList.
+OriginalCode@7-15:
+[7]     public void insert(Object x, MyLinkedListItr p) {
+[8]         if (p != null && p._current != null) {
+[9]             MyListNode tmp;
+[10]             synchronized (this) {
+[11]                 tmp = new MyListNode(x, p._current._next);
+[12]             } 
+[13]             p._current._next = tmp;
+[14]         }
+[15]     }
+FixedCode@7-15:
+[7]     public synchronized void insert(Object x, MyLinkedListItr p) {
+[8]         if (p != null && p._current != null) {
+[9]             MyListNode tmp = new MyListNode(x, p._current._next);
+[10]             p._current._next = tmp;
+[11]         }
+[12]     }
+
+
+ChangeLog:2@BugTester.java
+FixDescription: Ensure that each thread uses its own instance of MyListBuilder to avoid shared mutable state issues.
+OriginalCode@16-21:
+[16] 			MyListBuilder mlist = null;
+[17] 			for (int i = 0; i < builders; i++) {
+[18] 			  mlist = new MyListBuilder(
+[19] 					       mlst,i*step,(i+1)*step,true);
+[20] 			  threads[i] = new Thread(mlist);
+[21] 			}
+FixedCode@16-21:
+[16] 			MyListBuilder mlist = null;
+[17] 			for (int i = 0; i < builders; i++) {
+[18] 			  mlist = new MyListBuilder(
+[19] 					       mlst,i*step,(i+1)*step,true);
+[20] 			  threads[i] = new Thread(mlist);
+[21] 			}

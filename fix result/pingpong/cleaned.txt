@@ -1,0 +1,96 @@
+package pingpong;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+public class BuggedProgram {
+    private DataOutputStream output;
+    private int threadNumber;
+    private PP pingPongPlayer;
+    private int bugAppearanceNumber = 0;
+//...
+    public void doWork() {
+        ArrayList threads = new ArrayList();
+        for (int i = 0; i < threadNumber; i++) {
+            BugThread t = new BugThread(this);
+            t.start();
+            threads.add(t);
+        }
+        Iterator iterator = threads.iterator();
+        while (iterator.hasNext()) {
+            Thread t = (Thread) iterator.next();
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace(System.err);
+            }
+        }
+        try {
+            String newLine = System.getProperty("line.separator");
+            output.writeBytes(String.valueOf(this.bugAppearanceNumber + " bugs. " + newLine));
+            System.out.println("Bug appeanace Number" + this.bugAppearanceNumber);
+        } catch (IOException e) {
+            e.printStackTrace(System.err);
+        }
+    }
+    public void pingPong() {
+    	this.pingPongPlayer.getI();
+        PP newPlayer;
+        newPlayer = this.pingPongPlayer;
+        this.pingPongPlayer = null;
+        long time = System.currentTimeMillis();
+        while ((System.currentTimeMillis() - time) < 50) ;
+        this.pingPongPlayer = newPlayer;
+    }
+}package pingpong;
+public class BugThread extends Thread {
+    BuggedProgram bg;
+//...
+    public void run() {
+        this.ping();
+    }
+    public void ping() {
+        bg.pingPong();
+    }
+}package pingpong;
+import java.io.*;
+public class PingPong {
+    private BuggedProgram bug;
+    private DataOutputStream out;
+    private int threadsNumber;
+//...
+    public void doWork() {
+        String newLine = System.getProperty("line.separator");
+        try {
+            out.writeBytes("Number Of Threads: " + this.threadsNumber + " Number Of Bugs: ");
+        } catch (IOException e) {
+            e.printStackTrace(System.err);
+        }
+        this.bug.doWork();
+    }
+    public static void main(String[] args) {
+        File output = new File("output.txt");
+        DataOutputStream out = null;
+        try {
+            FileOutputStream os = new FileOutputStream(output);
+            out = new DataOutputStream(os);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace(System.err);
+        }
+        try {
+            String newLine = System.getProperty("line.separator");
+            out.writeBytes("In this file you will find the number of the bug appearances " +
+                    "accordingly to the number of threads that the " +
+                    "bugged program utilized with:" + newLine + newLine);
+            out.writeBytes("Few Threads: " + newLine + newLine);
+            PingPong fewThreads = new PingPong(out, 4);
+            fewThreads.doWork();
+        } catch (IOException e) {
+            e.printStackTrace(System.err);
+        }
+    }
+}package pingpong;
+public class PP {
+    private int i;
+//...
+}

@@ -1,0 +1,48 @@
+ChangeLog:1@HashCodeTest.java
+FixDescription: Ensure thread-safe access to the `hashCode` field in `IntRange` class by making it an `AtomicInteger`. This prevents multiple threads from concurrently modifying it, which can lead to inconsistent hash computations.
+OriginalCode@9-9:
+[9]     private transient int hashCode = 0;
+FixedCode@9-9:
+[9]     private transient AtomicInteger hashCode = new AtomicInteger(0);
+
+ChangeLog:2@HashCodeTest.java
+FixDescription: Modify the `hashCode` method in `IntRange` to use `AtomicInteger` methods for thread-safe updates.
+OriginalCode@39-44:
+[39]         if (hashCode == 0) {
+[40]             hashCode = 17;
+[41]             hashCode = 37 * hashCode + getClass().hashCode();
+[42]         }
+[43]         return hashCode;
+[44]     }
+FixedCode@39-44:
+[39]         if (hashCode.get() == 0) {
+[40]             int computedHashCode = 17;
+[41]             computedHashCode = 37 * computedHashCode + getClass().hashCode();
+[42]             hashCode.compareAndSet(0, computedHashCode);
+[43]         }
+[44]         return hashCode.get();
+
+ChangeLog:3@HashCodeTest.java
+FixDescription: Initialize the `IntRange` array `t` in `hashThread` class properly to ensure each thread works with its own copy of `IntRange` objects, avoiding shared mutable state issues.
+OriginalCode@35-35:
+[35] 		IntRange[] t = new IntRange[TEST_LENGTH];
+FixedCode@35-35:
+[35] 		IntRange[] t;
+
+ChangeLog:4@HashCodeTest.java
+FixDescription: Modify the constructor of `hashThread` to deep copy `IntRange` objects into each thread's own `t` array to prevent concurrent modification issues.
+OriginalCode@20-21:
+[20]             h[i] = new hashThread(rangeArrayA); 
+[21]         }
+FixedCode@20-21:
+[20]             h[i] = new hashThread(Arrays.copyOf(rangeArrayA, rangeArrayA.length)); 
+[21]         }
+
+ChangeLog:5@HashCodeTest.java
+FixDescription: Add necessary import for `AtomicInteger` and `Arrays` to support the changes.
+OriginalCode@1-1:
+[1] package hashcodetest;
+FixedCode@1-3:
+[1] package hashcodetest;
+[2] import java.util.concurrent.atomic.AtomicInteger;
+[3] import java.util.Arrays;

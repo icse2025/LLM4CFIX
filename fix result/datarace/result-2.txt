@@ -1,0 +1,25 @@
+ChangeLog:1@CustomerInfo.java
+FixDescription: Synchronize the deposit method to prevent concurrent modifications to the account balance which can lead to inconsistent states.
+OriginalCode@9-13:
+[9] 	public void deposit(int accountNumber, int amount){
+[10] 		int temp = accounts[accountNumber].getBalance();
+[11] 		temp = temp + amount;
+[12] 		accounts[accountNumber].setBalance(temp);
+[13] 		System.out.println("deposit " + amount + "now " + accounts[accountNumber].getBalance());
+FixedCode@9-13:
+[9] 	public synchronized void deposit(int accountNumber, int amount){
+[10] 		int temp = accounts[account,Number].getBalance();
+[11] 		temp = temp + amount;
+[12] 		accounts[accountNumber].setBalance(temp);
+[13] 		System.out.println("deposit " + amount + "now " + accounts[accountNumber].getBalance());
+
+ChangeLog:2@CustomerInfo.java
+FixDescription: Synchronize the check method to ensure atomicity when reading the account balance during verification.
+OriginalCode@15-17:
+[15] 	public boolean check(int accountNumber, int amount) {
+[16] 		return accounts[accountNumber].getBalance() == amount;
+[17] 	}
+FixedCode@15-17:
+[15] 	public synchronized boolean check(int accountNumber, int amount) {
+[16] 		return accounts[accountNumber].getBalance() == amount;
+[17] 	}

@@ -1,0 +1,152 @@
+ChangeLog:1@AlarmClock.java
+FixDescription: Ensure thread-safe access to the MyLinkedList in the Monitor class by synchronizing all methods that modify or access the list.
+OriginalCode@97-168:
+```java
+[97]     class MyLinkedList {
+[98]         private Object[] list = new new Object[2];
+[99]         private int capacity = 2;
+[100]        private int size = 0;
+[101]        public boolean isEmpty() {
+[102]            return size == 0;
+[103]        }
+[104]        public boolean isFull() {
+[105]            return size == capacity;
+[106]        }
+[107]        //...
+[108]        public void insertElementAt(Object obj, int index) {
+[109]            if (!this.isFull()) {
+[110]                for (int i = size - 1; i >= index; i--) {
+[111]                    list[i + 1] = list[i];
+[112]                }
+[113]                list[index] = obj;
+[114]                size++;
+[115]            }
+[116]        }
+[117]        public void addElement(Object obj) {
+[118]            if (!this.isFull()) {
+[119]                list[size] = obj;
+[120]                size++;
+[121]            }
+[122]        }
+[123]        public Object firstElement() {
+[124]            return list[0];
+[125]        }
+[126]        public void removeElementAt(int index) {
+[127]            if (!this.isEmpty()) {
+[128]                for (int i = index; i < (size - 1); i++) {
+[129]                    list[i] = list[i + 1];
+[130]                }
+[131]                list[size - 1] = null;
+[132]                size--;
+[133]            }
+[134]        }
+[135]        MyObject createLock(int n) {
+[136]            MyObject temp;
+[137]            int key;
+[138]            for (int i = 0; i < size; i++) {
+[139]                key = ((MyObject) list[i]).time;
+[140]                if (n == key) {
+[141]                    temp = (MyObject) list[i];
+[142]                    return temp;
+[143]                }
+[144]            }
+[145]            MyObject lock = new MyObject(n);
+[146]            for (int i = 0; i < size; i++) {
+[147]                key = ((MyObject) list[i]).time;
+[148]                if (n < key) {
+[149]                    this.insertElementAt((Object) lock, i);
+[150]                    return lock;
+[151]                }
+[152]            }
+[153]            this.addElement((Object) lock); 
+[154]            return lock;
+[155]        }
+[156]        MyObject getLock(int n) {
+[157]            MyObject temp;
+[158]            int m;
+[159]            for (int i = 0; i < size; i++) {
+[160]                m = ((MyObject) list[i]).time;
+[161]                if (n == m) {
+[162]                    temp = (MyObject) list[i];
+[163]                    return temp;
+[164]                }
+[165]            }
+[166]            throw new IndexOutOfBoundsException();
+[167]        }
+[168]    }
+```
+FixedCode@97-168:
+```java
+[97]     class MyLinkedList {
+[98]         private Object[] list = new Object[2];
+[99]         private int capacity = 2;
+[100]        private int size = 0;
+[101]        public synchronized boolean isEmpty() {
+[102]            return size == 0;
+[103]        }
+[104]        public synchronized boolean isFull() {
+[105]            return size == capacity;
+[106]        }
+[107]        //...
+[108]        public synchronized void insertElementAt(Object obj, int index) {
+[109]            if (!this.isFull()) {
+[110]                for (int i = size - 1; i >= index; i--) {
+[111]                    list[i + 1] = list[i];
+[112]                }
+[113]                list[index] = obj;
+[114]                size++;
+[115]            }
+[116]        }
+[117]        public synchronized void addElement(Object obj) {
+[118]            if (!this.isFull()) {
+[119]                list[size] = obj;
+[120]                size++;
+[121]            }
+[122]        }
+[123]        public synchronized Object firstElement() {
+[124]            return list[0];
+[125]        }
+[126]        public synchronized void removeElementAt(int index) {
+[127]            if (!this.isEmpty()) {
+[128]                for (int i = index; i < (size - 1); i++) {
+[129]                    list[i] = list[i + 1];
+[130]                }
+[131]                list[size - 1] = null;
+[132]                size--;
+[133]            }
+[134]        }
+[135]        public synchronized MyObject createLock(int n) {
+[136]            MyObject temp;
+[137]            int key;
+[138]            for (int i = 0; i < size; i++) {
+[139]                key = ((MyObject) list[i]).time;
+[140]                if (n == key) {
+[141]                    temp = (MyObject) list[i];
+[142]                    return temp;
+[143]                }
+[144]            }
+[145]            MyObject lock = new MyObject(n);
+[146]            for (int i = 0; i < size; i++) {
+[147]                key = ((MyObject) list[i]).time;
+[148]                if (n < key) {
+[149]                    this.insertElementAt((Object) lock, i);
+[150]                    return lock;
+[151]                }
+[152]            }
+[153]            this.addElement((Object) lock); 
+[154]            return lock;
+[155]        }
+[156]        public synchronized MyObject getLock(int n) {
+[157]            MyObject temp;
+[158]            int m;
+[159]            for (int i = 0; i < size; i++) {
+[160]                m = ((MyObject) list[i]).time;
+[161]                if (n == m) {
+[162]                    temp = (MyObject) list[i];
+[163]                    return temp;
+[164]                }
+[165]            }
+[166]            throw new IndexOutOfBoundsException();
+[167]        }
+[168]    }
+```

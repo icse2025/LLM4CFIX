@@ -1,0 +1,7 @@
+buggyprogram.BuggyProgram$User.present()V
+buggyprogram.BuggyProgram.acivateUsers([Lbuggyprogram/BuggyProgram$User;)V
+buggyprogram.BuggyProgram$User.record()V
+buggyprogram.BuggyProgram.main([Ljava/lang/String;)V
+buggyprogram.BuggyProgram.go()V
+buggyprogram.BuggyProgram$User.run()V
+buggyprogram.BuggyProgram$User.generate()V

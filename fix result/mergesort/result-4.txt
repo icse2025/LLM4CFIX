@@ -1,0 +1,76 @@
+ChangeLog:1@MergeSort.java
+FixDescription: Ensure that the main method does not overwrite the command line arguments, which could lead to unexpected behavior or errors when the program is run with different parameters.
+OriginalCode@9-14:
+[9]     static public void main(String[] args) {
+[10]         args = new String[2];
+[11]         args[0] = "output.txt";
+[12]         args[1] = "little";
+[13]         fileName = args[0];
+[14]         conCur = args[1];
+FixedCode@9-9:
+[9]     static public void main(String[] args) {
+[10]         if (args.length < 2) {
+[11]             System.out.println("Usage: java MergeSort <output file> <concurrency level>");
+[12]             System.exit(1);
+[13]         }
+[14]         fileName = args[0];
+[15]         conCur = args[1];
+
+ChangeLog:2@MSort.java
+FixDescription: Make the BufferedWriter and FileWriter instance variables non-static to avoid shared access issues across multiple instances of MSort, which can lead to incorrect file writing behavior when multiple threads are writing to the same file.
+OriginalCode@8-10:
+[8]     private static String outputFile;
+[9]     private static BufferedWriter bWriter;
+[10]     private static FileWriter fWriter;
+FixedCode@8-10:
+[8]     private String outputFile;
+[9]     private BufferedWriter bWriter;
+[10]     private FileWriter fWriter;
+
+ChangeLog:3@MSort.java
+FixDescription: Synchronize the methods that modify the shared static variables m_iCurrentThreadsAlive and m_iThreadLimit to prevent race conditions when threads concurrently access these methods.
+OriginalCode@57-61:
+[57]                 DecreaseThreadCounter();
+[58]                 rightSon.Sorting();
+[59]                 try {
+[60]                     leftSon.join();
+[61]                     IncreaseThreadCounter();
+FixedCode@57-61:
+[57]                 synchronized(MSort.class) {
+[58]                     DecreaseThreadCounter();
+[59]                 }
+[60]                 rightSon.Sorting();
+[61]                 try {
+[62]                     leftSon.join();
+[63]                     synchronized(MSort.class) {
+[64]                         IncreaseThreadCounter();
+[65]                     }
+[66]                 } catch (InterruptedException r)
+
+OriginalCode@71-78:
+[71]                 DecreaseThreadCounter();
+[72]                 rightSon.start();
+[73]                 DecreaseThreadCounter();
+[74]                 try {
+[75]                     leftSon.join();
+[76]                     IncreaseThreadCounter();
+[77]                     rightSon.join();
+[78]                     IncreaseThreadCounter();
+FixedCode@71-78:
+[71]                 synchronized(MSort.class) {
+[72]                     DecreaseThreadCounter();
+[73]                 }
+[74]                 rightSon.start();
+[75]                 synchronized(MSort.class) {
+[76]                     DecreaseThreadCounter();
+[77]                 }
+[78]                 try {
+[79]                     leftSon.join();
+[80]                     synchronized(MSort.class) {
+[81]                         IncreaseThreadCounter();
+[82]                     }
+[83]                     rightSon.join();
+[84]                     synchronized(MSort.class) {
+[85]                         IncreaseThreadCounter();
+[86]                     }
+[87]                 } catch (InterruptedException r)

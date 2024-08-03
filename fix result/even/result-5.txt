@@ -1,0 +1,18 @@
+ChangeLog:1@EvenGenerator.java
+FixDescription: Synchronize the next() method in EvenGenerator to ensure thread safety when incrementing currentValue.
+OriginalCode@3-9:
+[3] 	private int currentValue = 0;
+[4] 	private boolean cancled = false;
+[5] 	public int next(){
+[6] 		++currentValue;
+[7] 		++currentValue;
+[8] 		return currentValue;
+[9] 	}
+FixedCode@3-9:
+[3] 	private int currentValue = 0;
+[4] 	private boolean cancled = false;
+[5] 	public synchronized int next(){
+[6] 		++currentValue;
+[7] 		++currentValue;
+[8] 		return currentValue;
+[9] 	}

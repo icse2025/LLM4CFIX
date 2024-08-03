@@ -1,0 +1,3 @@
+d1.Process1.run()V
+d1.Deadlock.main([Ljava/lang/String;)V
+d1.Process2.run()V

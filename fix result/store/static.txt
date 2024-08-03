@@ -1,0 +1,3 @@
+store.StoreTest.run()V
+store.Store.consume(I)V
+store.StoreTest.main([Ljava/lang/String;)V

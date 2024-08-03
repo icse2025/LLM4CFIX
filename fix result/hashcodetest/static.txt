@@ -1,0 +1,4 @@
+hashcodetest.HashCodeTest.testHashCode()V
+hashcodetest.IntRange.hashCode()I
+hashcodetest.HashCodeTest$hashThread.run()V
+hashcodetest.HashCodeTest.main([Ljava/lang/String;)V

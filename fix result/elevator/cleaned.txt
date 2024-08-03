@@ -1,0 +1,295 @@
+package elevator;
+import java.util.*;
+public class Building {
+   public static final int MAX_FLOORS = 2; 
+   public static final int MAX_ELEVATORS = 1; 
+   public ElevatorController elevatorController;
+   public  volatile int peopleTakingStairs;
+   public volatile int peopleOutside = Simulator.MAX_PEOPLE;
+   public volatile int peopleWorking;
+//...
+} package elevator;
+public class DoorClosedException extends Exception {
+   public DoorClosedException() {
+   }
+}package elevator;
+import java.util.*;
+public class Elevator implements Runnable {
+   public static final int MOVING_UP = 1;
+   public static final int NO_DIRECTION = 0;
+   public static final int MOVING_DOWN = -1;
+   public static final int MOVING = 1;
+   public static final int STOPPED = 0;
+   public static final int DOOR_OPEN = 1;
+   public static final int DOOR_CLOSED = 0;
+   private static final long FLOOR_WAIT_TIME = 1000; 
+   public static final long FLOOR_TRAVEL_TIME = 1000;
+   private static final long INACTIVE_TIME = 1000 * 2;
+   private static final int MAX_OCCUPANCY = 20;
+   private int elevatorID; 
+   private int doorState; 
+   private int motionState;
+   private int motionDirection;
+   private volatile int currentFloorNumber;
+   private boolean requestDoorOpen;
+   private boolean[] destinationList = new boolean[Building.MAX_FLOORS]; 
+   private static ElevatorController elevatorController; 
+   private Vector riders = new Vector();
+   private Thread activeElevator;
+   private Logger log;
+   private volatile boolean keepRunning;
+//...
+   public void run() {  
+       if(Simulator.debug) log.write("Starting elevator " + elevatorID);
+        while(keepRunning){
+           switch(motionState){
+               case STOPPED:
+                  if(Simulator.debug) log.write("Elevator " + elevatorID + " is stopped");
+                  if(riders.isEmpty() && !isDestination()){
+                     motionDirection = NO_DIRECTION;
+                     if(Simulator.debug) log.write("Elevator " + elevatorID + " is empty and has no destination");
+                     action(INACTIVE_TIME);
+                  }else if(isArrived()){
+                     if(Simulator.debug) log.write("Elevator " + elevatorID + " has arrived on " + currentFloorNumber);
+                     openDoor();
+                     closingDoor();
+                     removeDestination();
+                  }else{
+                     if(Simulator.debug) log.write("Elevator " + elevatorID + " is continuing to travel");
+                     travel();
+                  }
+                  break;
+               case MOVING:
+                  if(isArrived()){
+                     stopElevator();
+                  }else{
+                     travel();
+                  }
+                  break;
+           }
+           if(Simulator.debug) log.write(getState().toString());
+        }
+        if(Simulator.debug) log.close();
+   } 
+   private void action(long time){
+   }
+ } package elevator;
+import java.util.*;
+public class ElevatorController {
+   private Vector elevators;
+   private Vector floors;
+   private Logger log;
+//...
+ } package elevator;
+public class ElevatorFullException extends Exception {
+   public ElevatorFullException() {
+   }
+}package elevator;
+public class ElevatorMovingException  extends Exception {
+   public ElevatorMovingException() {
+   }
+}package elevator;
+public class ElevatorState  {
+   public int elevatorID;
+   public int motionState;
+   public int motionDirection;
+   public int currentFloorNumber;
+   public int numberRiders;
+   public int doorState;
+   public String destinations;
+//...
+}package elevator;
+import java.util.*;
+public class Floor {
+   private int floorNumber;
+   private volatile boolean summonUp;
+   private volatile boolean summonDown;
+   private Vector upWaiting = new Vector(); 
+   private Vector downWaiting = new Vector(); 
+   private static ElevatorController elevatorController;
+   private Logger log;
+//...
+} package elevator;
+import java.io.*;
+import java.text.*;
+import java.util.*;
+public class Logger {
+   private String preFix = "c:\\logs\\";
+   private String lineSeparator;
+   private String fileName;
+   private BufferedWriter out;
+   private File file;
+//...
+   public  void write(String message){
+   }
+   public void close(){
+   }
+}package elevator;
+import java.util.*;
+public class Person implements Runnable{
+   public static final int WAITING = 1; 
+   public static final int TAKING_STAIRS = 2; 
+   public static final int WORKING = 3;
+   public static final int WALKING_OUTSIDE = 4;
+   public static final int RIDING = 5;
+   public static final int GOING_NOWHERE = -1;
+   public static final int OUTSIDE = -1;
+   public static final int IN_ELEVATOR = 0;
+   private static Building building;
+   private int personID; 
+   private int destination;
+   private int location; 
+   private int activity; 
+   private Elevator elevator; 
+   private Floor floor;
+   private Thread activePerson;
+   private Logger log;
+   private volatile boolean keepRunning;
+//...
+   public void run(){
+      while(keepRunning){
+         switch(activity){
+            case WALKING_OUTSIDE:
+               if(wantsToEnter()){
+                  building.peopleOutside--;
+                  setDestination();
+                  floor = building.enterBuilding();
+                  location = floor.getFloorNumber();
+                  if(destination > location){ 
+                     activity = WAITING;
+                     setWaitTime();
+                     floor.summonElevatorUp(this);
+                     action();
+                  }else{ 
+                     building.peopleWorking++;
+                     activity = WORKING;
+                     destination = GOING_NOWHERE;
+                     setWorkingTime();
+                     action();
+                  }
+               }else{ 
+                  destination = GOING_NOWHERE;
+                  location = OUTSIDE;
+                  activity = WALKING_OUTSIDE;
+                  setWorkingTime();
+                  action();
+               }
+               break;
+            case TAKING_STAIRS:
+               if(location == destination){
+                  building.peopleTakingStairs--;
+                  building.peopleWorking++;
+                  activity = WORKING;
+                  floor = building.getFloor(location);
+                  destination = GOING_NOWHERE;
+                  setWorkingTime();
+                  action();
+               }else if(destination > location){
+                  climbUp();
+               }else{
+                  climbDown();
+               }
+               break;
+            case WAITING:
+               if(elevator != null){
+                  enterElevator();
+               }else{ 
+                  if(wantsToTakeStairs()){
+                     floor.stopWaiting(this);
+                     building.peopleTakingStairs++;
+                     activity = TAKING_STAIRS;
+                     if(destination > location){
+                        climbUp();
+                     }else{
+                        climbDown();
+                     }
+                  }else{
+                     setWaitTime();
+                     action();
+                  }
+               }
+               break;
+            case WORKING:
+               if(location == 1){
+                  if(wantsToLeave()){
+                     building.peopleOutside++;
+                     building.peopleWorking--;
+                     destination = GOING_NOWHERE;
+                     location = OUTSIDE;
+                     activity = WALKING_OUTSIDE;
+                     setWorkingTime();
+                     action();
+                  }else{ 
+                     setDestination();
+                     if(destination > location){ 
+                        building.peopleWorking--;
+                        activity = WAITING;
+                        setWaitTime();
+                        floor.summonElevatorUp(this);
+                        action();
+                     }else{ 
+                        activity = WORKING;
+                        destination = GOING_NOWHERE;
+                        setWorkingTime();
+                        action();
+                     }
+                  }
+               }else{ 
+                  setDestination();
+                  if(destination > location){ 
+                     building.peopleWorking--;
+                     activity = WAITING;
+                     setWaitTime();
+                     floor.summonElevatorUp(this);
+                     action();
+                  }else if(destination < location){
+                     building.peopleWorking--;
+                     activity = WAITING;
+                     setWaitTime();
+                     floor.summonElevatorDown(this);
+                     action();
+                  }else{ 
+                     activity = WORKING;
+                     destination = GOING_NOWHERE;
+                     setWorkingTime();
+                     action();
+                  }
+               }
+               break;
+            case RIDING:
+               if(elevator.getCurrentFloorNumber() == destination){
+                  leaveElevator();
+               }else
+                  setWaitTime();
+                  action();
+               break;
+         }
+         if(Simulator.debug) log.write(getState().toString());
+      }
+      if(Simulator.debug) log.close();
+   }
+	private void setWaitTime() {
+	}
+	private void setWorkingTime() {
+	}
+   private void action(){
+   }
+} package elevator;
+public class PersonState  {
+   public int personNumber;
+   public int activity;
+   public int location;
+   public int destination;
+   public int elevatorNumber;
+   public PersonState() {
+   }
+//...
+}package elevator;
+import java.util.*;
+public class Simulator  {
+   public static boolean debug = false;
+   public static final int MAX_PEOPLE = 2; 
+   public static final int MAX_TIME = 60;
+   private static volatile int counter;
+//...
+} 

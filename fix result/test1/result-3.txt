@@ -1,0 +1,18 @@
+result-2.txtresult-1.txtChangeLog:1@D.java
+FixDescription: Synchronize access to the shared variable 'x' to prevent race conditions.
+OriginalCode@3-9:
+[3]     int x = 0;
+[4]     void m1() {
+[5]         x++;
+[6]     }
+[7]     void m2() {
+[8]         x *= 2;
+[9]     }
+FixedCode@3-9:
+[3]     int x = 0;
+[4]     synchronized void m1() {
+[5]         x++;
+[6]     }
+[7]     synchronized void m2() {
+[8]         x *= 2;
+[9]     }

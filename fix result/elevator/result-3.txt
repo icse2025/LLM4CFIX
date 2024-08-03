@@ -1,0 +1,71 @@
+ChangeLog:1@Person.java
+FixDescription: Fix atomicity violation in decrementing and incrementing people counters to ensure thread-safe operations.
+OriginalCode@27-29:
+[27]                if(wantsToEnter()){
+[28]                   building.peopleOutside--;
+[29]                   setDestination();
+FixedCode@27-29:
+[27]                if(wantsToEnter()){
+[28]                   synchronized(building) {
+[29]                       building.peopleOutside--;
+[30]                   }
+[31]                   setDestination();
+
+OriginalCode@53-55:
+[53]                if(location == destination){
+[54]                   building.peopleTakingStairs--;
+[55]                   building.peopleWorking++;
+FixedCode@53-55:
+[53]                if(location == destination){
+[54]                   synchronized(building) {
+[55]                       building.peopleTakingStairs--;
+[56]                       building.peopleWorking++;
+[57]                   }
+
+OriginalCode@88-90:
+[88]                   if(wantsToLeave()){
+[89]                      building.peopleOutside++;
+[90]                      building.peopleWorking--;
+FixedCode@88-90:
+[88]                   if(wantsToLeave()){
+[89]                      synchronized(building) {
+[90]                          building.peopleOutside++;
+[91]                          building.peopleWorking--;
+[92]                      }
+
+ChangeLog:2@Person.java
+FixDescription: Ensure atomicity when changing activity states and related properties to prevent inconsistent states due to concurrent modifications.
+OriginalCode@32-34:
+[32]                   if(destination > location){ 
+[33]                      activity = WAITING;
+[34]                      setWaitTime();
+FixedCode@32-34:
+[32]                   if(destination > location){ 
+[33]                      synchronized(this) {
+[34]                          activity = WAITING;
+[35]                      }
+[36]                      setWaitTime();
+
+OriginalCode@97-99:
+[97]                      setDestination();
+[98]                      if(destination > location){ 
+[99]                         building.peopleWorking--;
+FixedCode@97-99:
+[97]                      setDestination();
+[98]                      if(destination > location){ 
+[99]                         synchronized(building) {
+[100]                            building.peopleWorking--;
+[101]                        }
+
+ChangeLog:3@Person.java
+FixDescription: Fix data race in updating location and activity by ensuring these operations are atomic to prevent inconsistent reads during concurrent access.
+OriginalCode@91-93:
+[91]                      destination = GOING_NOWHERE;
+[92]                      location = OUTSIDE;
+[93]                      activity = WALKING_OUTSIDE;
+FixedCode@91-93:
+[91]                      synchronized(this) {
+[92]                          destination = GOING_NOWHERE;
+[93]                          location = OUTSIDE;
+[94]                          activity = WALKING_OUTSIDE;
+[95]                      }

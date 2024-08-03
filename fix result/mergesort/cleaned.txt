@@ -1,0 +1,122 @@
+package mergesort;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+public class MergeSort {
+    private static String fileName;
+    private static String conCur;
+    public MergeSort() {
+    }
+    static public void main(String[] args) {
+        args = new String[2];
+        args[0] = "output.txt";
+        args[1] = "little";
+        fileName = args[0];
+        conCur = args[1];
+        String concurrency;
+        FileWriter fWriter;
+        BufferedWriter bWriter;
+        concurrency = "4";
+        if (conCur.compareTo("little") == 0)
+            concurrency = "4";
+        if (conCur.compareTo("average") == 0)
+            concurrency = "6";
+        if (conCur.compareTo("lot") == 0)
+            concurrency = "14";
+        String[] argv = {concurrency, "4", "5", "6", "7", "8", "9", "6", "54", "10", "54", "6", "54", "87", "5", "46", "81", "54", "88", "4", "5", "321", "54", "8795", "215", "45454", "215", "123", "546", "22", "456", "789", "46", "456", "548", "777", "856", "321", "11", "784", "1234", "4569", "123", "123", "545454", "7785", "7898", "77785", "785", "963", "4521"};
+        MSort MSort = new MSort(argv, fileName);
+        MSort.ResetThreadCounter();
+        MSort.Sorting();
+        MSort.PrintResults();
+    }
+}package mergesort;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+public class MSort extends Thread {
+    private static String outputFile;
+    private static BufferedWriter bWriter;
+    private static FileWriter fWriter;
+//...
+    public MSort(int[] iArray) {
+        m_iArray = iArray;
+        bIsInit = true;
+    }
+    public MSort(String[] sCommandLine, String fileName) {
+        if (!Init(sCommandLine)) {
+            System.exit(-1);
+        }
+        outputFile = fileName;
+        bIsInit = true;
+        try {
+            fWriter = new FileWriter(outputFile);
+            bWriter = new BufferedWriter(fWriter);
+        } catch (IOException e) {
+            System.out.println("jj");
+            System.exit(-1);
+        }
+    }
+    public void run()
+    {
+        Sorting(); 
+    }
+    public void Sorting() {
+        if (!bIsInit)
+        {
+            System.out.println("The data isn't initialized !");
+            return;
+        }
+        int iSize = m_iArray.length;
+        if (iSize == 1)
+            return;
+        int[] iA = new int[iSize / 2];
+        int[] iB = new int[iSize - (iSize / 2)];
+        CopyArrays(m_iArray, iA, iB);
+        int iMultiThreadedSons = AvailableThreadsState();
+        MSort leftSon = new MSort(iA);
+        MSort rightSon = new MSort(iB);
+        switch (iMultiThreadedSons) {
+            case 0://No available threads in system
+                leftSon.Sorting();
+                rightSon.Sorting();
+                Merge(iA, iB, m_iArray);
+                break;
+            case 1://Only 1 thread available
+                leftSon.start();
+                DecreaseThreadCounter();
+                rightSon.Sorting();
+                try {
+                    leftSon.join();
+                    IncreaseThreadCounter();
+                } catch (InterruptedException r)
+                {
+                    System.out.println("!!!! Thread Execution Failed !!!!!");
+                    System.exit(-1);
+                }
+                Merge(iA, iB, m_iArray);
+                break;
+            case 2:
+                leftSon.start();
+                DecreaseThreadCounter();
+                rightSon.start();
+                DecreaseThreadCounter();
+                try {
+                    leftSon.join();
+                    IncreaseThreadCounter();
+                    rightSon.join();
+                    IncreaseThreadCounter();
+                } catch (InterruptedException r)
+                {
+                    System.out.println("!!!! Thread Execution Failed !!!!!");
+                    System.exit(-1);
+                }
+                Merge(iA, iB, m_iArray);
+                break;
+        }
+    }
+    private int[] m_iArray; 
+    private static int m_iThreadLimit;
+    private static int m_iCurrentThreadsAlive;
+    private boolean bIsInit;
+}

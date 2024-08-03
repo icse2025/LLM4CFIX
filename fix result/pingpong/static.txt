@@ -1,0 +1,6 @@
+pingpong.BugThread.run()V
+pingpong.PingPong.doWork()V
+pingpong.BugThread.ping()V
+pingpong.PingPong.main([Ljava/lang/String;)V
+pingpong.BuggedProgram.pingPong()V
+pingpong.BuggedProgram.doWork()V

@@ -1,0 +1,2 @@
+critical.Section.run()V
+critical.Critical.main([Ljava/lang/String;)V

@@ -1,0 +1,19 @@
+ChangeLog:1@StringBufferTest.java
+FixDescription: Ensure that operations on shared StringBuffer instances are properly synchronized to avoid data races when accessed by multiple threads.
+OriginalCode@11-14:
+[11]                     al1.append(al2);
+[12]                     break;
+[13]             case 1:
+[14]                 al1.delete(0, al1.length());
+FixedCode@11-14:
+[11]                     synchronized (al1) {
+[12]                         synchronized (al2) {
+[13]                             al1.append(al2);
+[14]                         }
+[15]                     }
+[16]                     break;
+[17]             case 1:
+[18]                 synchronized (al1) {
+[19]                     al1.delete(0, al1.length());
+[20]                 }
+[21]                 break;

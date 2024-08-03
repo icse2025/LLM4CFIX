@@ -1,0 +1,4 @@
+mergesort.MergeSort.main([Ljava/lang/String;)V
+mergesort.MSort.Sorting()V
+java.lang.Thread.start()V
+mergesort.MSort.run()V

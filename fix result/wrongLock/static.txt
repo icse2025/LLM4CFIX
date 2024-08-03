@@ -1,0 +1,6 @@
+wrongLock.WrongLock.B()V
+wrongLock.WrongLock.A()V
+wrongLock.TClass1.run()V
+wrongLock.TClass2.run()V
+wrongLock.Main.run()V
+wrongLock.Main.main([Ljava/lang/String;)V

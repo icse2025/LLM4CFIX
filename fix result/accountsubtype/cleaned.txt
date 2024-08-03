@@ -1,0 +1,80 @@
+package accountsubtype;
+public abstract class Account {
+  protected String  name;
+  protected int number;
+  protected int amount;
+//...
+  public synchronized void deposit(int money){
+      amount+=money;
+  }
+  public synchronized void withdraw(int money){
+      amount-=money;
+  }
+  public abstract void transfer(Account dest, int mn);
+  synchronized void print() { 
+  }
+}package accountsubtype;
+public class Bank {
+  Manager[] managers;
+  Account[] accounts;
+//...
+  public void work() {
+    for (int i=0; i<managers.length; i++){
+      managers[i].start();
+    }
+    try {
+      for (int i=0; i<managers.length; i++){
+        managers[i].join();
+      }
+    } catch (InterruptedException ie) {}
+  }
+}package accountsubtype;
+public class BusinessAccount extends Account {
+//...
+  public synchronized void transfer(Account dest, int transferAmount){
+      amount -= transferAmount;
+      synchronized (dest) { dest.amount+=transferAmount; }
+  }
+}package accountsubtype;
+public class Main {
+    public static void main(String[] args) {
+        int numBusinessAccounts = 20;
+        int numPersonalAccounts = 1;
+        if (args != null && args.length == 2) {
+            numBusinessAccounts = Integer.parseInt(args[0]);
+            numPersonalAccounts = Integer.parseInt(args[1]);
+        }
+        Bank bank = new Bank(numBusinessAccounts, numPersonalAccounts, 100);
+        bank.work();
+        bank.printAllAccounts();
+        for (int i = 0; i < numBusinessAccounts + numPersonalAccounts; i++) {
+            if (bank.getAccount(i).getBalance() != 300) {
+                throw new RuntimeException("bug found");
+            }
+        }
+    }
+}package accountsubtype;
+public class Manager extends Thread {
+  Bank bank;
+  Account account;
+  int accountNumber;
+//...
+  public void run(){
+    int nextNumber;
+    account.deposit(300);
+    nextNumber = bank.nextAccountNumber(accountNumber);
+    account.transfer(bank.getAccount(nextNumber),10);
+    account.deposit(10);
+    account.withdraw(20);
+    account.deposit(10);
+    account.transfer(bank.getAccount(nextNumber),10);
+    account.withdraw(100);
+  }
+}package accountsubtype;
+public class PersonalAccount extends Account {
+//...
+  public synchronized void transfer(Account ac, int mn){
+      amount-=mn;
+      ac.amount+=mn;
+  }
+}

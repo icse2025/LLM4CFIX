@@ -1,0 +1,12 @@
+ChangeLog:1@Main.java
+FixDescription: Fix the atomicity violation by synchronizing the update of the shared Struct object to ensure that the updates to 'number' and 'count' are atomic and thread-safe.
+OriginalCode@19-21:
+[19]     @Override
+[20]     public void run() {
+[21]         s = new Struct(s.getNumber() * 2, s.getCount() + 1);
+FixedCode@19-21:
+[19]     @Override
+[20]     public void run() {
+[21]         synchronized (Main.class) {
+[22]             s = new Struct(s.getNumber() * 2, s.getCount() + 1);
+[23]         }

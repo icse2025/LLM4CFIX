@@ -1,0 +1,14 @@
+ChangeLog:1@Main.java
+FixDescription: Synchronize the access to shared variables 'a' and 'b' to ensure atomicity and visibility of changes across threads.
+OriginalCode@8-11:
+[8]     public void run() {
+[9]         a = num;
+[10]        b = num;
+[11]    }
+FixedCode@8-11:
+[8]     public void run() {
+[9]         synchronized (Main.class) {
+[10]            a = num;
+[11]            b = num;
+[12]        }
+[13]    }

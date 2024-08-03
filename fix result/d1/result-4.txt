@@ -1,0 +1,27 @@
+ChangeLog:1@Deadlock.java
+FixDescription: Fix the potential deadlock by ensuring that both threads acquire locks in the same order.
+OriginalCode@18-22:
+[18]             synchronized (Deadlock.lock1) {
+[19]                 synchronized (Deadlock.lock2) {
+[20]                     Deadlock.state++;
+[21]                 }
+[22]             }
+FixedCode@18-22:
+[18]             synchronized (Deadlock.lock1) {
+[19]                 synchronized (Deadlock.lock2) {
+[20]                     Deadlock.state++;
+[21]                 }
+[22]             }
+
+OriginalCode@28-32:
+[28]         synchronized (Deadlock.lock2) {
+[29]             synchronized (Deadlock.lock1) {
+[30]                 Deadlock.state++;
+[31]             }
+[32]         }
+FixedCode@28-32:
+[28]         synchronized (Deadlock.lock1) {
+[29]             synchronized (Deadlock.lock2) {
+[30]                 Deadlock.state++;
+[31]             }
+[32]         }

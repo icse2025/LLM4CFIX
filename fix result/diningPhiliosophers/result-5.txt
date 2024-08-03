@@ -1,0 +1,20 @@
+### ChangeLog:1@DiningPhilosophers.java
+FixDescription: Fix potential deadlock by enforcing a global order on fork acquisition. This change ensures that each philosopher always picks up the lower numbered fork first and then the higher numbered fork, regardless of their seating arrangement.
+
+OriginalCode@13-17:
+```java
+[13] 		for (int i=0; i<num; i++){
+[14] 			if (i==0)
+[15] 				phils[i] = new Philosopher(forks[num-1],forks[i]);
+[16] 			else
+[17] 				phils[i] = new Philosopher(forks[i-1],forks[i]);
+```
+FixedCode@13-17:
+```java
+[13] 		for (int i=0; i<num; i++){
+[14] 			if (i==0)
+[15] 				phils[i] = new Philosopher(forks[i], forks[num-1]); // Reverse fork order for the first philosopher
+[16] 			else
+[17] 				phils[i] = new Philosopher(forks[i-1], forks[i]); // Standard order: always left fork before right fork
+```
+Note: This change eliminates the circular wait condition by ensuring that the fork with the highest number (last fork in the array) is not the first one picked by the first philosopher. Instead, it becomes the second fork they attempt to acquire, breaking the cycle that leads to deadlock.

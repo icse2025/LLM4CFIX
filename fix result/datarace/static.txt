@@ -1,0 +1,7 @@
+datarace.Main.main([Ljava/lang/String;)V
+datarace.Checker.run()V
+datarace.CustomerInfo.deposit(II)V
+datarace.Account.setBalance(I)V
+datarace.Account.getBalance()I
+datarace.CustomerInfo.check(II)Z
+datarace.ThreadRun.run()V

@@ -1,0 +1,27 @@
+ChangeLog:1@Bug.java
+FixDescription: Ensure thread-safe increment and check of Num_Of_Seats_Sold using synchronized block to prevent race conditions.
+OriginalCode@26-30:
+[26]         Num_Of_Seats_Sold++;                       
+[27]         if (Num_Of_Seats_Sold > Maximum_Capacity)  
+[28]             StopSales = true;                      
+[29]     }
+FixedCode@26-30:
+[26]         synchronized (Bug.class) {
+[27]             Num_Of_Seats_Sold++;
+[28]             if (Num_Of_Seats_Sold > Maximum_Capacity)
+[29]                 StopSales = true;
+[30]         }
+
+ChangeLog:2@Bug.java
+FixDescription: Add synchronization to the check and modification of StopSales and Num_Of_Seats_Sold in the constructor to ensure atomicity and visibility of these shared variables.
+OriginalCode@17-19:
+[17]             if( StopSales ){
+[18]                  Num_Of_Seats_Sold--;
+[19]                  break;
+FixedCode@17-21:
+[17]             synchronized (Bug.class) {
+[18]                 if( StopSales ){
+[19]                     Num_Of_Seats_Sold--;
+[20]                     break;
+[21]                 }
+[22]             }

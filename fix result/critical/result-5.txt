@@ -1,0 +1,50 @@
+ChangeLog:1@Section.java
+FixDescription: Fix the concurrency issue by ensuring proper synchronization when accessing and modifying the shared variable 'turn' in the Critical class. This prevents race conditions and ensures that the critical section is accessed by only one thread at a time.
+OriginalCode@7-24:
+[7]         if(threadNumber == 0)
+[8]         {
+[9]             t.turn = 0;
+[10]             System.out.println("In critical section, thread number = " + threadNumber);
+[11]             if(t.turn != 0)
+[12]                 throw new RuntimeException();
+[13]             System.out.println("Out critical section, thread number = " + threadNumber);
+[14]             t.turn = 1;
+[15]         }
+[16]         else
+[17]         {
+[18]             if(threadNumber == 1)
+[19]             {
+[20]                 t.turn = 1;
+[21]                 System.out.println("In critical section, thread number = " + threadNumber);
+[22]                 while(t.turn != 1);
+[23]                 System.out.println("Out critical section, thread number = " + threadNumber);
+[24]                 t.turn = 0;          }
+FixedCode@7-24:
+[7]         synchronized(t) {
+[8]             if(threadNumber == 0)
+[9]             {
+[10]                 t.turn = 0;
+[11]                 System.out.println("In critical section, thread number = " + threadNumber);
+[12]                 while(t.turn != 0) {
+[13]                     try {
+[14]                         t.wait();
+[15]                     } catch (InterruptedException e) {}
+[16]                 }
+[17]                 System.out.println("Out critical section, thread number = " + threadNumber);
+[18]                 t.turn = 1;
+[19]                 t.notifyAll();
+[20]             }
+[21]             else if(threadNumber == 1)
+[22]             {
+[23]                 t.turn = 1;
+[24]                 System.out.println("In critical section, thread number = " + threadNumber);
+[25]                 while(t.turn != 1) {
+[26]                     try {
+[27]                         t.wait();
+[28]                     } catch (InterruptedException e) {}
+[29]                 }
+[30]                 System.out.println("Out critical section, thread number = " + threadNumber);
+[31]                 t.turn = 0;
+[32]                 t.notifyAll();
+[33]             }
+[34]         }

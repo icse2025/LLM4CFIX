@@ -1,0 +1,22 @@
+### ChangeLog:1@SetCheck2.java
+FixDescription: Ensure atomic update of related fields `a` and `b` within a single synchronized block to prevent race conditions where these variables are set in separate synchronized blocks. This ensures consistency between `a` and `b` across all threads.
+OriginalCode@6-13:
+```java
+[6]     synchronized (this) {
+[7]     	a = i;
+[8]     	System.out.println("a set to " + i);
+[9]     }
+[10] 	synchronized (this) {
+[11] 		b = -i;
+[12] 		System.out.println("b set to " + -i);
+[13] 	}
+```
+FixedCode@6-13:
+```java
+[6]     synchronized (this) {
+[7]         a = i;
+[8]         b = -i;
+[9]         System.out.println("a set to " + i);
+[10]        System.out.println("b set to " + -i);
+[11]    }
+```

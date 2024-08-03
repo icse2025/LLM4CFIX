@@ -1,0 +1,12 @@
+ChangeLog:1@Main.java
+FixDescription: Synchronize access to the shared Struct object to prevent race conditions when multiple threads modify it concurrently.
+OriginalCode@7-9:
+[7]     @Override
+[8]     public void run() {
+[9]         s = new Struct(s.getNumber() * 2, s.getCount() + 1);
+FixedCode@7-9:
+[7]     @Override
+[8]     public void run() {
+[9]         synchronized (Main.class) {
+[10]             s = new Struct(s.getNumber() * 2, s.getCount() + 1);
+[11]         }

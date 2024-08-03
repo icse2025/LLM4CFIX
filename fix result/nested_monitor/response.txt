@@ -1,0 +1,35 @@
+ChangeLog:1@NestedMonitor.java
+FixDescription: Correct the semaphore usage in SemaBuffer to ensure proper synchronization and avoid potential deadlocks or incorrect signaling.
+OriginalCode@7-11:
+[7]   synchronized public void put(Object o)
+[8]               throws InterruptedException {
+[9]     empty.down();
+[10]     full.up();
+[11]   }
+FixedCode@7-11:
+[7]   public void put(Object o)
+[8]               throws InterruptedException {
+[9]     empty.down();
+[10]     synchronized(this) {
+[11]         full.up();
+[12]     }
+[13]   }
+
+OriginalCode@12-16:
+[12]   synchronized public Object get()
+[13]                throws InterruptedException{
+[14]     full.down();
+[15]     empty.up();
+[16]     return (null); 
+FixedCode@12-17:
+[12]   public Object get()
+[13]                throws InterruptedException{
+[14]     full.down();
+[15]     synchronized(this) {
+[16]         empty.up();
+[17]     }
+[18]     return (null); 
+
+Explanation:
+- The original code used synchronized on the entire methods `put` and `get`, which could lead to deadlocks especially when combined with the semaphore operations that might block (e.g., `down()` waiting for a signal). By moving the synchronization inside the methods to only wrap the semaphore operations that need atomicity with respect to other operations in the class, we reduce the scope of locking and prevent deadlocks.
+- The `full.up()` and `empty.up()` operations are now within a synchronized block, ensuring that the semaphore's signal operations are safely executed without holding the lock for the entire method duration. This minimizes the locking overhead and potential contention, improving concurrency while maintaining correct operation ordering and atomicity.

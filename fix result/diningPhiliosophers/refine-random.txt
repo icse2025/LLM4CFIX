@@ -1,0 +1,70 @@
+ChangeLog:1@DiningPhilosophers.java
+FixDescription: Prevent deadlock by ensuring all philosophers acquire forks in a consistent order.
+
+OriginalCode@15-17:
+[15] 				phils[i] = new Philosopher(forks[num-1],forks[i]);
+[16] 			else
+[17] 				phils[i] = new Philosopher(forks[i-1],forks[i]);
+
+FixedCode@15-17:
+[15] 				if (i == 0)
+[16] 					phils[i] = new Philosopher(forks[i], forks[num-1]);
+[17] 				else
+[18] 					phils[i] = new Philosopher(forks[i - 1], forks[i]);
+
+ChangeLog:2@DiningPhilosophers.java
+FixDescription: Ensure that each philosopher acquires forks in the same consistent order to prevent potential deadlock.
+
+OriginalCode@32-35:
+[32]             synchronized (rightFork) {
+[33]                 synchronized (leftFork) {
+[34]                 }
+[35]             }
+
+FixedCode@32-35:
+[32]             if (rightFork.hashCode() < leftFork.hashCode()) {
+[33]                 synchronized (rightFork) {
+[34]                     synchronized (leftFork) {
+[35]                     }
+[36]                 }
+[37]             } else {
+[38]                 synchronized (leftFork) {
+[39]                     synchronized (rightFork) {
+[40]                     }
+[41]                 }
+[42]             }
+
+
+
+
+ChangeLog:1@DiningPhilosophers.java
+FixDescription: Fixed concurrency issues in the Philosopher class to prevent potential deadlock.
+OriginalCode@31-36:
+[31]         synchronized (rightFork) {
+[32]             synchronized (leftFork) {
+[33]             }
+[34]         }
+[35]     }
+[36] }
+FixedCode@31-36:
+[31]         synchronized (leftFork) {
+[32]             synchronized (rightFork) {
+[33]             }
+[34]         }
+[35]     }
+[36] }
+
+ChangeLog:2@DiningPhilosophers.java
+FixDescription: Adjusted the initialization of Philosophers to avoid holding both forks simultaneously during initialization.
+OriginalCode@14-18:
+[14]         if (i==0)
+[15]             phils[i] = new Philosopher(forks[num-1],forks[i]);
+[16]         else
+[17]             phils[i] = new Philosopher(forks[i-1],forks[i]);
+[18]     }
+FixedCode@14-18:
+[14]         if (i==0)
+[15]             phils[i] = new Philosopher(forks[i], forks[num-1]);
+[16]         else
+[17]             phils[i] = new Philosopher(forks[i], forks[(i+1) % num]);
+[18]     }

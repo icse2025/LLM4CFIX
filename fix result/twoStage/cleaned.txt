@@ -1,0 +1,68 @@
+package twoStage;
+public class Data {
+    public int value;
+//...
+}package twoStage;
+public class Main extends Thread {
+    static int iTthreads=1;
+    static int iRthreads=1;
+    TwoStage ts;
+    Data data1,data2;
+	public void run() {
+		data1=new Data();
+		data2=new Data();
+		ts = new TwoStage(data1,data2);
+		for (int i=0;i<iTthreads;i++)
+			new TwoStageThread(ts).start();
+		for (int i=0;i<iRthreads;i++)
+			new ReadThread(ts).start();
+	}
+	public static void main(String[] args) {
+		if (args.length < 2){
+			System.out.println("ERROR: Expected 2 parameters");
+		}else{
+			iTthreads = Integer.parseInt(args[0]);
+			iRthreads = Integer.parseInt(args[1]);
+			Main t=new Main();
+			t.run();
+		}
+	}
+}package twoStage;
+public class ReadThread extends Thread {
+	TwoStage ts;
+//...
+	public void run() {
+		ts.B();
+	}
+}package twoStage;
+public class TwoStage {
+    public Data data1,data2;
+//...
+    public void A () {
+       synchronized (data1) {
+           data1.value=1;
+       }
+       synchronized (data2) {   		
+           data2.value=data1.value+1;
+       }
+    }
+    public void B () {
+	int t1=-1, t2=-1;
+        synchronized (data1) {
+	    if (data1.value==0) return ; 
+	        t1=data1.value;
+	}
+	synchronized (data2) {
+	    t2=data2.value;
+	}
+        if (t2 != (t1+1))
+	    throw new RuntimeException("bug found");
+    }
+}package twoStage;
+public class TwoStageThread extends Thread {
+	TwoStage ts;
+//...
+	public void run() {
+		ts.A();
+	}
+}

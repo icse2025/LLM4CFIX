@@ -1,0 +1,25 @@
+ChangeLog:1@TwoStage.java
+FixDescription: Ensure atomicity in method A to prevent atomicity violation by synchronizing the entire sequence of operations that modify data1 and data2. This prevents other threads from reading inconsistent states between the operations.
+OriginalCode@5-11:
+[5]     public void A () {
+[6]        synchronized (data1) {
+[7]            data1.value=1;
+[8]        }
+[9]        synchronized (data2) {   		
+[10]            data2.value=data1.value+1;
+[11]        }
+FixedCode@5-11:
+[5]     public void A () {
+[6]        synchronized (this) {
+[7]            data1.value=1;
+[8]            data2.value=data1.value+1;
+[9]        }
+[10]        
+[11]        
+
+ChangeLog:2@Main.java
+FixDescription: Correct the misuse of the 'run' method in the 'main' method to properly start the thread, ensuring that the threads are correctly managed and started in a separate call stack.
+OriginalCode@23-23:
+[23] 			t.run();
+FixedCode@23-23:
+[23] 			t.start();

@@ -1,0 +1,35 @@
+ChangeLog:1@CheckField.java
+FixDescription: Added synchronization to prevent concurrent modification of shared variables in InstanceExample by multiple threads.
+OriginalCode@8-15:
+[8] 				public void run() {
+[9] 					System.out.println("new thread." + ex.number);
+[10] 					ex.number = 12;
+[11] 					ex.num2 = 12;
+[12] 					if (ex.number != 12)
+[13] 						throw new RuntimeException("not equal");
+[14] 					int c = ex.num2;
+[15] 				}
+FixedCode@8-15:
+[8] 				public void run() {
+[9] 					synchronized(ex) {
+[10] 						System.out.println("new thread." + ex.number);
+[11] 						ex.number = 12;
+[12] 						ex.num2 = 12;
+[13] 						if (ex.number != 12)
+[14] 							throw new RuntimeException("not equal");
+[15] 						int c = ex.num2;
+[16] 					}
+[17] 				}
+
+OriginalCode@19-22:
+[19] 				public void run() {
+[20] 					ex.number = 13;
+[21] 					ex.num2 = 1;
+[22] 				}
+FixedCode@19-22:
+[19] 				public void run() {
+[20] 					synchronized(ex) {
+[21] 						ex.number = 13;
+[22] 						ex.num2 = 1;
+[23] 					}
+[24] 				}

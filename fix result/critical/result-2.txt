@@ -1,0 +1,28 @@
+ChangeLog:1@Section.java
+FixDescription: Fix the busy-waiting loop in thread 1 to correctly wait for its turn and use volatile keyword for the 'turn' variable to ensure visibility across threads.
+OriginalCode@3-4:
+[3]     Critical t;
+[4]     int threadNumber;
+FixedCode@3-4:
+[3]     volatile Critical t;
+[4]     int threadNumber;
+
+OriginalCode@20-24:
+[20]                 t.turn = 1;
+[21]                 System.out.println("In critical section, thread number = " + threadNumber);
+[22]                 while(t.turn != 1);
+[23]                 System.out.println("Out critical section, thread number = " + threadNumber);
+[24]                 t.turn = 0;
+FixedCode@20-24:
+[20]                 t.turn = 1;
+[21]                 System.out.println("In critical section, thread number = " + threadNumber);
+[22]                 while(t.turn != 0);  // Correct the condition to wait until it's not thread 0's turn
+[23]                 System.out.println("Out critical section, thread number = " + threadNumber);
+[24]                 t.turn = 0;
+
+ChangeLog:2@Critical.java
+FixDescription: Declare 'turn' as a volatile variable to ensure changes are visible across threads.
+OriginalCode@3-3:
+[3]    public int turn;
+FixedCode@3-3:
+[3]    public volatile int turn;

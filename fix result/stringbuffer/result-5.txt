@@ -1,0 +1,14 @@
+ChangeLog:1@StringBufferTest.java
+FixDescription: Ensure that operations on shared StringBuffer instances are properly synchronized to avoid data races when accessed by multiple threads.
+OriginalCode@21-22:
+[21]         (new StringBufferTest(al1, al2, 0)).start();
+[22]         (new StringBufferTest(al2, al1, 1)).start();
+FixedCode@21-22:
+[21]         StringBufferTest test1 = new StringBufferTest(al1, al2, 0);
+[22]         StringBufferTest test2 = new StringBufferTest(al2, al1, 1);
+[23]         synchronized (al1) {
+[24]             synchronized (al2) {
+[25]                 test1.start();
+[26]                 test2.start();
+[27]             }
+[28]         }

@@ -1,0 +1,29 @@
+It seems there was an issue with the formatting of the code snippet. Let's correct that and ensure the fix addresses the concurrency issue without introducing compilation errors.
+
+ChangeLog:1@DiningPhilosophers.java
+FixDescription: Fix potential deadlock by ensuring that all philosophers pick up and release forks in the same order.
+OriginalCode@14-17:
+[14] 			if (i==0)
+[15] 				phils[i] = new Philosopher(forks[num-1],forks[i]);
+[16] 			else
+[17] 				phils[i] = new Philosopher(forks[i-1],forks[i]);
+FixedCode@14-17:
+[14] 			if (i==0)
+[15] 				phils[i] = new Philosopher(forks[i], forks[num-1]); // Reverse fork order for the first philosopher
+[16] 			else
+[17] 				phils[i] = new Philosopher(forks[i-1], forks[i]);
+
+ChangeLog:2@DiningPhilosophers.java
+FixDescription: Ensure consistent locking order by always locking the lower index fork first.
+OriginalCode@32-34:
+[32]             synchronized (rightFork) {
+[33]                 synchronized (leftFork) {
+[34]                 }
+[35]             }
+FixedCode@32-34:
+[32]             Fork firstFork = (System.identityHashCode(rightFork) < System.identityHashCode(leftFork)) ? rightFork : leftFork;
+[33]             Fork secondFork = (firstFork == rightFork) ? leftFork : rightFork;
+[34]             synchronized (firstFork) {
+[35]                 synchronized (secondFork) {
+[36]                 }
+[37]             }

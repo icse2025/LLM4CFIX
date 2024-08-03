@@ -1,0 +1,11 @@
+stringbuffer.StringBuffer.append(Ljava/lang/String;)Lstringbuffer/StringBuffer;
+stringbuffer.StringBuffer.expandCapacity(I)V
+stringbuffer.StringBuffer.delete(II)Lstringbuffer/StringBuffer;
+java.lang.Thread.start()V
+stringbuffer.StringBufferTest.main([Ljava/lang/String;)V
+stringbuffer.StringBuffer.getChars(II[CI)V
+stringbuffer.StringBuffer.<init>(Ljava/lang/String;)V
+stringbuffer.StringBufferTest.run()V
+stringbuffer.StringBuffer.append(Lstringbuffer/StringBuffer;)Lstringbuffer/StringBuffer;
+stringbuffer.StringBuffer.copy()V
+stringbuffer.StringBuffer.length()I

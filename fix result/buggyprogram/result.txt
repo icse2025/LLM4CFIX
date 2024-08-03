@@ -1,0 +1,104 @@
+ChangeLog:1@BuggyProgram.java
+FixDescription: Fixed concurrency issues in `BuggyProgram` class by ensuring synchronized access to shared data structures (`history`, `generated`, and `presented`).
+
+OriginalCode@12-15:
+[12]     protected long randomNumber = INVALID;
+[13]     protected static long[] history = null,
+[14]             generated = null,
+[15]             presented = null;
+
+FixedCode@12-15:
+[12]     protected long randomNumber = INVALID;
+[13]     protected static volatile long[] history = null,
+[14]             generated = null,
+[15]             presented = null;
+
+ChangeLog:2@BuggyProgram.java
+FixDescription: Added synchronization around `buffer` modifications to ensure thread safety.
+
+OriginalCode@35-39:
+[35]         for (i = 0; i < numOfUsers; ++i) {
+[36]             buffer.append("\nUser (" + i + ") generated " + generated[i] + ", " +
+[37]                     "presented " + presented[i] + ", and recorded " +
+[38]                     history[i]);
+[39]         }
+
+FixedCode@35-39:
+[35]         for (i = 0; i < numOfUsers; ++i) {
+[36]             synchronized (buffer) {
+[37]                 buffer.append("\nUser (" + i + ") generated " + generated[i] + ", " +
+[38]                         "presented " + presented[i] + ", and recorded " +
+[39]                         history[i]);
+[40]             }
+[41]         }
+
+ChangeLog:3@BuggyProgram.java
+FixDescription: Ensured synchronized access to `randomNumber` generation and `history` checks to prevent data inconsistency.
+
+OriginalCode@134-143:
+[134]         public void run() {
+[135]             int i = 0;
+[136]             while (i != numOfUsers) {
+[137]                 generate();
+[138]                 for (i = 0; i < numOfUsers; ++i) {
+[139]                     if (history[i] == randomNumber) {
+[140]                         break;
+[141]                     }
+[142]                 }
+[143]             }
+[144]             present();
+[145]             record();
+[146]         }
+
+FixedCode@134-143:
+[134]         public void run() {
+[135]             int i = 0;
+[136]             synchronized (history) {
+[137]               while (i != numOfUsers) {
+[138]                   generate();
+[139]                   for (i = 0; i < numOfUsers; ++i) {
+[140]                       if (history[i] == randomNumber) {
+[141]                             break;
+[142]                       }
+[143]                   }
+[144]                 }
+[145]             }
+[146]             present();
+[147]             record();
+[148]         }
+
+ChangeLog:4@BuggyProgram.java
+FixDescription: Added synchronization to `generate`, `present`, and `record` methods in the `User` class to ensure thread safety.
+
+OriginalCode@147-157:
+[147]         protected synchronized void generate() {
+[148]             generated[userNumber] = randomNumber = random.nextInt(1000);
+[149]             System.out.println(randomNumber);
+[150]         }
+[151]         protected synchronized void present() {
+[152]             System.out.println("user " + userNumber + " assigned "
+[153]                     + (presented[userNumber] = randomNumber) + ".");
+[154]         }
+[155]         protected synchronized void record() {
+[156]             history[userNumber] = randomNumber;
+[157]         }
+
+FixedCode@147-157:
+[147]         protected void generate() {
+[148]             synchronized (generated) {
+[149]                 randomNumber = random.nextInt(1000);
+[150]                 generated[userNumber] = randomNumber;
+[151]                 System.out.println(randomNumber);
+[152]             }
+[153]         }
+[154]         protected void present() {
+[155]             synchronized (presented) {
+[156]                 presented[userNumber] = randomNumber;
+[157]                 System.out.println("user " + userNumber + " assigned " + presented[userNumber] + ".");
+[158]             }
+[159]         }
+[160]         protected void record() {
+[161]             synchronized (history) {
+[162]                 history[userNumber] = randomNumber;
+[163]             }
+[164]         }

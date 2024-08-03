@@ -1,0 +1,51 @@
+ChangeLog:1@MSort.java
+FixDescription: Ensure thread-safe operations on shared variables for thread count management using synchronized methods.
+OriginalCode@56-61:
+[56]                 leftSon.start();
+[57]                 DecreaseThreadCounter();
+[58]                 rightSon.Sorting();
+[59]                 try {
+[60]                     leftSon.join();
+[61]                     IncreaseThreadCounter();
+
+FixedCode@56-61:
+[56]                 leftSon.start();
+[57]                 synchronized(this) { DecreaseThreadCounter(); }
+[58]                 rightSon.Sorting();
+[59]                 try {
+[60]                     leftSon.join();
+[61]                     synchronized(this) { IncreaseThreadCounter(); }
+
+OriginalCode@70-78:
+[70]                 leftSon.start();
+[71]                 DecreaseThreadCounter();
+[72]                 rightSon.start();
+[73]                 DecreaseThreadCounter();
+[74]                 try {
+[75]                     leftSon.join();
+[76]                     IncreaseThreadCounter();
+[77]                     rightSon.join();
+[78]                     IncreaseThreadCounter();
+
+FixedCode@70-78:
+[70]                 leftSon.start();
+[71]                 synchronized(this) { DecreaseThreadCounter(); }
+[72]                 rightSon.start();
+[73]                 synchronized(this) { DecreaseThreadCounter(); }
+[74]                 try {
+[75]                     leftSon.join();
+[76]                     synchronized(this) { IncreaseThreadCounter(); }
+[77]                     rightSon.join();
+[78]                     synchronized(this) { IncreaseThreadCounter(); }
+
+ChangeLog:2@MSort.java
+FixDescription: Ensure exclusive access to BufferedWriter to prevent data race when multiple threads attempt to write to the file.
+OriginalCode@23-24:
+[23]             fWriter = new FileWriter(outputFile);
+[24]             bWriter = new BufferedWriter(fWriter);
+
+FixedCode@23-24:
+[23]             fWriter = new FileWriter(outputFile, true); // Enable append mode to avoid overwriting by concurrent threads
+[24]             synchronized(MSort.class) {
+[24]                 bWriter = new BufferedWriter(fWriter);
+[24]             }

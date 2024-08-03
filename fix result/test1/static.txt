@@ -1,0 +1,6 @@
+test1.D.m2()V
+test1.D.test()V
+test1.D$2.run()V
+test1.D.m1()V
+test1.D$1.run()V
+test1.D.main([Ljava/lang/String;)V

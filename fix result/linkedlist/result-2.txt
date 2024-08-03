@@ -1,0 +1,46 @@
+ChangeLog:1@MyLinkedList.java
+FixDescription: Ensure thread-safe insertion into the linked list by moving the synchronization block to cover the entire insertion process, including the update of the next pointer of the current node.
+OriginalCode@8-13:
+[8]         if (p != null && p._current != null) {
+[9]             MyListNode tmp;
+[10]             synchronized (this) {
+[11]                 tmp = new MyListNode(x, p._current._next);
+[12]             } 
+[13]             p._current._next = tmp;
+FixedCode@8-12:
+[8]         if (p != null && p._current != null) {
+[9]             synchronized (this) {
+[10]                 MyListNode tmp = new MyListNode(x, p._current._next);
+[11]                 p._current._next = tmp;
+[12]             }
+
+ChangeLog:2@BugTester.java
+FixDescription: Correct the logic in the main method to ensure that the last instance of MyListBuilder used for printing and emptying the list is not null and refers to a valid object.
+OriginalCode@16-27:
+[16]             MyListBuilder mlist = null;
+[17]             for (int i = 0; i < builders; i++) {
+[18]                 mlist = new MyListBuilder(
+[19]                            mlst,i*step,(i+1)*step,true);
+[20]                 threads[i] = new Thread(mlist);
+[21]             }
+[22]             for (int i = 0; i < builders; i++) 
+[23]                 threads[i].start();
+[24]             for (int i = 0; i < builders; i++) 
+[25]                 threads[i].join();
+[26]             mlist.print();           
+[27]             mlist.empty();           
+FixedCode@16-27:
+[16]             MyListBuilder mlist = null;
+[17]             MyListBuilder lastMlist = null;
+[18]             for (int i = 0; i < builders; i++) {
+[19]                 mlist = new MyListBuilder(
+[20]                            mlst,i*step,(i+1)*step,true);
+[21]                 threads[i] = new Thread(mlist);
+[22]                 lastMlist = mlist;
+[23]             }
+[24]             for (int i = 0; i < builders; i++) 
+[25]                 threads[i].start();
+[26]             for (int i = 0; i < builders; i++) 
+[27]                 threads[i].join();
+[28]             lastMlist.print();           
+[29]             lastMlist.empty();          

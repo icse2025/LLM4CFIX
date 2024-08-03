@@ -1,0 +1,26 @@
+### ChangeLog:1@BuggedProgram.java
+FixDescription: Ensure thread-safe access to the `pingPongPlayer` field in the `BuggedProgram` class to prevent concurrency issues such as null pointer exceptions and data races when threads are switching the player instance. Use synchronization when accessing and modifying `pingPongPlayer`.
+OriginalCode@36-43:
+```java
+[36]     public void pingPong() {
+[37]     	this.pingPongPlayer.getI();
+[38]         PP newPlayer;
+[39]         newPlayer = this.pingPongPlayer;
+[40]         this.pingPongPlayer = null;
+[41]         long time = System.currentTimeMillis();
+[42]         while ((System.currentTimeMillis() - time) < 50) ;
+[43]         this.pingPongPlayer = newPlayer;
+```
+FixedCode@36-44:
+```java
+[36]     public synchronized void pingPong() {
+[37]         if (this.pingPongPlayer != null) {
+[38]             this.pingPongPlayer.getI();
+[39]         }
+[40]         PP newPlayer;
+[41]         newPlayer = this.pingPongPlayer;
+[42]         this.pingPongPlayer = null;
+[43]         long time = System.currentTimeMillis();
+[44]         while ((System.currentTimeMillis() - time) < 50) ;
+[45]         this.pingPongPlayer = newPlayer;
+```

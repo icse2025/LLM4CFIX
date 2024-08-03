@@ -1,0 +1,61 @@
+package nested_monitor;
+class SemaBuffer implements Buffer {
+  protected int size;
+  Semaphore full; 
+  Semaphore empty;
+//...
+  synchronized public void put(Object o)
+              throws InterruptedException {
+    empty.down();
+    full.up();
+  }
+  synchronized public Object get()
+               throws InterruptedException{
+    full.down();
+    empty.up();
+    return (null); 
+  }
+}
+public class NestedMonitor  {
+  static int SIZE = 5; 
+  static Buffer buf;
+    public static void main(String [] args) {
+        buf = new SemaBuffer(SIZE);
+	new Producer(buf).start();
+    	new Consumer(buf).start();
+    }
+}
+class Producer extends Thread {
+    Buffer buf;
+//...
+    public void run() {
+      try {
+        while(true) {
+            buf.put(null); 
+        }
+      } catch (InterruptedException e){}
+    }
+}
+class Consumer extends Thread {
+    Buffer buf;
+//...
+    public void run() {
+      try {
+        while(true) {
+            buf.get(); 
+        }
+      } catch(InterruptedException e ){}
+    }
+}package nested_monitor;
+public class Semaphore {
+    private int value;
+//...
+    synchronized public void up() {
+        ++value;
+        notifyAll();  
+    }
+    synchronized public void down() throws InterruptedException {
+        while (value==0) wait();
+        --value;
+    }
+}

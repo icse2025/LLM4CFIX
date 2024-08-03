@@ -1,0 +1,2 @@
+wronglock2.Main.run()V
+wronglock2.Main.main([Ljava/lang/String;)V

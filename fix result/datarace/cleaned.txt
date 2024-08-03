@@ -1,0 +1,71 @@
+package datarace;
+public class Account {
+	private int balance;
+	public int getBalance() {
+		return balance;
+	}
+	public void setBalance(int balance) {
+		this.balance = balance;
+	}
+}package datarace;
+public class Checker implements Runnable {
+	private CustomerInfo ci;
+	public boolean buggy;
+//...
+	public void run() {
+		if (!ci.check(1, 50 * Main.THREAD_NUMBER)) {
+			buggy = true;
+		}
+	}
+}package datarace;
+public class CustomerInfo {
+	private int nAccount;
+	private Account[] accounts;
+	public CustomerInfo() {
+		super();
+	}
+//...
+	public void deposit(int accountNumber, int amount){
+		int temp = accounts[accountNumber].getBalance();
+		temp = temp + amount;
+		accounts[accountNumber].setBalance(temp);
+		System.out.println("deposit " + amount + "now " + accounts[accountNumber].getBalance());
+	}
+	public boolean check(int accountNumber, int amount) {
+		return accounts[accountNumber].getBalance() == amount;
+	}
+}package datarace;
+public class Main {
+	public static int THREAD_NUMBER = 6;
+	public static void main(String[] args) throws Exception {
+		int nAccount = 10;
+		Account[] accounts = new Account[10];
+		for (int i = 0; i < 10; i++) {
+			accounts[i] = new Account();
+		}
+		CustomerInfo ci = new CustomerInfo(nAccount, accounts);
+		ThreadRun[] t = new ThreadRun[THREAD_NUMBER];
+		for (int i = 0; i < THREAD_NUMBER; i++) {
+			t[i] = new ThreadRun(ci);
+			t[i].start();
+		}
+		for (int i = 0; i < THREAD_NUMBER; i++) {
+			t[i].join();
+		}
+		Checker checker = new Checker(ci);
+		Thread ct = new Thread(checker);
+		ct.start();
+		ct.join();
+		if (checker.buggy) {
+			throw new Exception("bug found.");
+		}
+	}
+}package datarace;
+public class ThreadRun extends Thread{
+	CustomerInfo ci;
+//...
+	@Override
+	public void run() {
+		ci.deposit(1, 50);
+	}
+}

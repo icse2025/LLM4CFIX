@@ -1,0 +1,8 @@
+ChangeLog:1@Deadlock.java
+FixDescription: Fix the potential deadlock by ensuring that all threads acquire locks in the same order.
+OriginalCode@6-7:
+[6] 	Client client1 = new Client(lock1, lock2);
+[7] 	Client client2 = new Client(lock2, lock1);
+FixedCode@6-7:
+[6] 	Client client1 = new Client(lock1, lock2);
+[7] 	Client client2 = new Client(lock1, lock2);

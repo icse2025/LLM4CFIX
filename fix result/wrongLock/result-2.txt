@@ -1,0 +1,34 @@
+ChangeLog:1@WrongLock.java
+FixDescription: Ensure consistent synchronization on the same object to avoid atomicity violation and data races.
+OriginalCode@5-17:
+```java
+[5]     public void A() {
+[6]         synchronized (data) {
+[7]             int x = data.value;
+[8]             data.value++;
+[9]             if (data.value != (x + 1))
+[10]                 throw new RuntimeException("bug found");
+[11]         }
+[12]     }
+[13]     public void B() {
+[14]         synchronized (this) {
+[15]             data.value++;
+[16]         }
+[17]     }
+```
+FixedCode@5-17:
+```java
+[5]     public void A() {
+[6]         synchronized (data) {
+[7]             int x = data.value;
+[8]             data.value++;
+[9]             if (data.value != (x + 1))
+[10]                 throw new RuntimeException("bug found");
+[11]         }
+[12]     }
+[13]     public void B() {
+[14]         synchronized (data) {
+[15]             data.value++;
+[16]         }
+[17]     }
+```

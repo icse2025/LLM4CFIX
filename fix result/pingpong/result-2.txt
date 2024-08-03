@@ -1,0 +1,23 @@
+ChangeLog:1@BuggedProgram.java
+FixDescription: Fix the race condition in the pingPong method by synchronizing access to the shared pingPongPlayer object to prevent multiple threads from modifying it concurrently.
+OriginalCode@40-48:
+[40]     public void pingPong() {
+[41]     	this.pingPongPlayer.getI();
+[42]         PP newPlayer;
+[43]         newPlayer = this.pingPongPlayer;
+[44]         this.pingPongPlayer = null;
+[45]         long time = System.currentTimeMillis();
+[46]         while ((System.currentTimeMillis() - time) < 50) ;
+[47]         this.pingPongPlayer = newPlayer;
+[48]     }
+FixedCode@40-48:
+[40]     public synchronized void pingPong() {
+[41]         if (this.pingPongPlayer != null) {
+[42]             this.pingPongPlayer.getI();
+[43]         }
+[44]         PP newPlayer = this.pingPongPlayer;
+[45]         this.pingPongPlayer = null;
+[46]         long time = System.currentTimeMillis();
+[47]         while ((System.currentTimeMillis() - time) < 50) ;
+[48]         this.pingPongPlayer = newPlayer;
+[49]     }

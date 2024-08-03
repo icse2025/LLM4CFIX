@@ -1,0 +1,26 @@
+ChangeLog:1@NestedMonitor.java
+FixDescription: Correct the order of semaphore operations in the put and get methods to prevent deadlocks and ensure proper synchronization between producers and consumers.
+OriginalCode@7-11:
+[7]   synchronized public void put(Object o)
+[8]               throws InterruptedException {
+[9]     empty.down();
+[10]    full.up();
+[11]  }
+FixedCode@7-11:
+[7]   synchronized public void put(Object o)
+[8]               throws InterruptedException {
+[9]     empty.down();
+[10]    try {
+[11]      full.up();
+OriginalCode@12-16:
+[12]  synchronized public Object get()
+[13]               throws InterruptedException{
+[14]    full.down();
+[15]    empty.up();
+[16]    return (null); 
+FixedCode@12-16:
+[12]  synchronized public Object get()
+[13]               throws InterruptedException{
+[14]    full.down();
+[15]    try {
+[16]      empty.up();

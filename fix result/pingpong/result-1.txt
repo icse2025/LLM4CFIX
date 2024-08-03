@@ -1,0 +1,20 @@
+ChangeLog:1@BuggedProgram.java
+FixDescription: Synchronize access to the shared mutable object `pingPongPlayer` to prevent concurrent modification errors.
+OriginalCode@13-19:
+[13]         this.pingPongPlayer.getI();
+[14]         PP newPlayer;
+[15]         newPlayer = this.pingPongPlayer;
+[16]         this.pingPongPlayer = null;
+[17]         long time = System.currentTimeMillis();
+[18]         while ((System.currentTimeMillis() - time) < 50) ;
+[19]         this.pingPongPlayer = newPlayer;
+FixedCode@13-19:
+[13]         synchronized(this) {
+[14]             this.pingPongPlayer.getI();
+[15]             PP newPlayer;
+[16]             newPlayer = this.pingPongPlayer;
+[17]             this.pingPongPlayer = null;
+[18]             long time = System.currentTimeMillis();
+[19]             while ((System.currentTimeMillis() - time) < 50) ;
+[20]             this.pingPongPlayer = newPlayer;
+[21]         }

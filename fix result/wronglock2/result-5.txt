@@ -1,0 +1,21 @@
+ChangeLog:1@Main.java
+FixDescription: Synchronize access to the shared Struct object to prevent race conditions when threads modify it concurrently.
+OriginalCode@19-21:
+[19]     @Override
+[20]     public void run() {
+[21]         s = new Struct(s.getNumber() * 2, s.getCount() + 1);
+FixedCode@19-21:
+[19]     @Override
+[20]     public void run() {
+[21]         synchronized (Main.class) {
+[22]             s = new Struct(s.getNumber() * 2, s.getCount() + 1);
+[23]         }
+
+ChangeLog:2@Main.java
+FixDescription: Ensure atomicity of updates to the Struct object's fields by making them volatile or by using Atomic classes.
+OriginalCode@23-24:
+[23]         int number;
+[24]         int count;
+FixedCode@23-24:
+[23]         volatile int number;
+[24]         volatile int count;

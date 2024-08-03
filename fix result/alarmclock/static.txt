@@ -1,0 +1,14 @@
+alarmclock.MyLinkedList.firstElement()Ljava/lang/Object;
+alarmclock.MyLinkedList.createLock(I)Lalarmclock/MyObject;
+alarmclock.MyLinkedList.isEmpty()Z
+alarmclock.AlarmClock.main([Ljava/lang/String;)V
+alarmclock.MyLinkedList.insertElementAt(Ljava/lang/Object;I)V
+alarmclock.MyLinkedList.removeElementAt(I)V
+alarmclock.MyLinkedList.addElement(Ljava/lang/Object;)V
+alarmclock.MyLinkedList.isFull()Z
+alarmclock.Monitor.wakeme(II)V
+java.lang.Thread.start()V
+alarmclock.Monitor.tick()V
+alarmclock.MyLinkedList.getLock(I)Lalarmclock/MyObject;
+alarmclock.Client.run()V
+alarmclock.Clock.run()V

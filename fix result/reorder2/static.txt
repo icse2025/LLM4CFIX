@@ -1,0 +1,5 @@
+reorder2.ReorderTest2.main([Ljava/lang/String;)V
+reorder2.CheckThread2.run()V
+reorder2.SetCheck2.set(I)V
+reorder2.SetThread2.run()V
+reorder2.ReorderTest2.run()V

@@ -1,0 +1,12 @@
+ChangeLog:1@DiningPhilosophers.java
+FixDescription: Fix potential deadlock by ensuring that all philosophers pick up and release forks in the same order.
+OriginalCode@14-17:
+[14]             if (i==0)
+[15]                 phils[i] = new Philosopher(forks[num-1],forks[i]);
+[16]             else
+[17]                 phils[i] = new Philosopher(forks[i-1],forks[i]);
+FixedCode@14-17:
+[14]             if (i==0)
+[15]                 phils[i] = new Philosopher(forks[i], forks[num-1]); // Reverse the order for the first philosopher
+[16]             else
+[17]                 phils[i] = new Philosopher(forks[i-1], forks[i]);

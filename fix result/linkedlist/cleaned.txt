@@ -1,0 +1,81 @@
+package linkedlist;
+public class BugTester
+{
+	public static void main(String[] args)
+	{
+		int builders = 2;
+		int maxsize = 6;
+                if (args != null && args.length == 2) {
+		  builders = Integer.parseInt(args[0]);
+		  maxsize = Integer.parseInt(args[1]);
+		}
+                int step = maxsize/builders;
+		Thread[] threads = new Thread[builders];
+		try {
+			MyLinkedList mlst = new MyLinkedList(maxsize);
+			MyListBuilder mlist = null;
+			for (int i = 0; i < builders; i++) {
+			  mlist = new MyListBuilder(
+					       mlst,i*step,(i+1)*step,true);
+			  threads[i] = new Thread(mlist);
+			}
+			for (int i = 0; i < builders; i++) 
+				threads[i].start();
+			for (int i = 0; i < builders; i++) 
+				threads[i].join();
+			mlist.print();			
+			mlist.empty();			
+		} catch (InterruptedException e) {
+			throw new RuntimeException("interrupted exception");
+		}
+	}
+}package linkedlist;
+import java.io.IOException;
+class MyLinkedList {
+    private MyListNode _header;    
+    private int _maxsize;
+//...
+    public void insert(Object x, MyLinkedListItr p) {
+        if (p != null && p._current != null) {
+            MyListNode tmp;
+            synchronized (this) {
+                tmp = new MyListNode(x, p._current._next);
+            } 
+            p._current._next = tmp;
+        }
+    }
+    public void addLast(Object x) {
+        MyListNode itr = this._header;
+        while (itr._next != null)
+            itr = itr._next;
+        insert(x, new MyLinkedListItr(itr));
+    }
+}package linkedlist;
+    class MyLinkedListItr
+    {
+		public MyListNode _current;    
+//...
+    }package linkedlist;
+import java.io.IOException;
+class MyListBuilder implements Runnable
+{
+	public boolean _debug = true;
+	public Object _list = null;
+	public int _bound1 = 0;
+	public int _bound2 = 0;
+//...
+	public void run()
+	{
+		for ( int i = this._bound1; i < this._bound2 ;i++ )
+		{
+				((MyLinkedList)_list).addLast(new Integer(i));
+		}
+	}
+}package linkedlist;
+    class MyListNode
+    {
+		public Object _element;			
+        public MyListNode _next;		
+        MyListNode( Object theElement ){ this( theElement, null ); }
+//...
+    }

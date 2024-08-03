@@ -1,0 +1,12 @@
+ChangeLog:1@store/Store.java
+FixDescription: Synchronize the consume method to prevent race conditions when multiple threads modify the customerCost variable.
+OriginalCode@4-7:
+[4] //...
+[5] 	public void consume(int cost) {
+[6] 		customerCost += cost;
+[7] 	}
+FixedCode@4-7:
+[4] //...
+[5] 	public synchronized void consume(int cost) {
+[6] 		customerCost += cost;
+[7] 	}

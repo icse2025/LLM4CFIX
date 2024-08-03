@@ -1,0 +1,53 @@
+ChangeLog:1@StringBufferTest.java
+FixDescription: Ensure proper synchronization when accessing and modifying StringBuffer instances across multiple threads to prevent data races and ensure thread safety.
+OriginalCode@19-22:
+[19]         StringBuffer al1 = new StringBuffer("Hello");
+[20]         StringBuffer al2 = new StringBuffer("World");
+[21]         (new StringBufferTest(al1, al2, 0)).start();
+[22]         (new StringBufferTest(al2, al1, 1)).start();
+
+FixedCode@19-22:
+[19]         StringBuffer al1 = new StringBuffer("Hello");
+[20]         StringBuffer al2 = new StringBuffer("World");
+[21]         StringBufferTest test1 = new StringBufferTest(al1, al2, 0);
+[22]         StringBufferTest test2 = new StringBufferTest(al2, al1, 1);
+[23]         synchronized (al1) {
+[24]             synchronized (al2) {
+[25]                 test1.start();
+[26]                 test2.start();
+[27]             }
+[28]         }
+
+ChangeLog:2@StringBuffer.java
+FixDescription: Modify the append method for StringBuffer to handle potential deadlocks when appending another StringBuffer instance to itself.
+OriginalCode@68-79:
+[68]     public synchronized StringBuffer append(StringBuffer sb) {
+[69]         if (sb == null) {
+[70]             sb = NULL;
+[71]         }
+[72]         int len = sb.length();
+[73]         int newcount = count + len;
+[74]         if (newcount > value.length)
+[75]             expandCapacity(newcount);
+[76]         sb.getChars(0, len, value, count);
+[77]         count = newcount;
+[78]         return this;
+[79]     }
+
+FixedCode@68-79:
+[68]     public StringBuffer append(StringBuffer sb) {
+[69]         if (sb == null) {
+[70]             sb = NULL;
+[71]         }
+[72]         synchronized (this) {
+[73]             synchronized (sb) {
+[74]                 int len = sb.length();
+[75]                 int newcount = count + len;
+[76]                 if (newcount > value.length)
+[77]                     expandCapacity(newcount);
+[78]                 sb.getChars(0, len, value, count);
+[79]                 count = newcount;
+[80]             }
+[81]         }
+[82]         return this;
+[83]     }

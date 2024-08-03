@@ -1,0 +1,21 @@
+result.txtChangeLog:1@Account.java
+FixDescription: Ensure atomicity and prevent data races in the transfer method by always synchronizing both the source and destination accounts in a consistent order based on their hash codes to avoid deadlocks.
+OriginalCode@12-19:
+[12]   synchronized  void transfer(Account ac,double mn){
+[13]       amount-=mn;
+[14]       if (name.equals("D")) {
+[15] 	System.out.println("unprotected");
+[16]             ac.amount += mn;
+[17]       } else {
+[18] 	synchronized (ac) { ac.amount+=mn; }
+[19]       }
+FixedCode@12-19:
+[12]   void transfer(Account ac, double mn) {
+[13]       Account firstLock = System.identityHashCode(this) < System.identityHashCode(ac) ? this : ac;
+[14]       Account secondLock = this == firstLock ? ac : this;
+[15]       synchronized (firstLock) {
+[16]           synchronized (secondLock) {
+[17]               amount -= mn;
+[18]               ac.amount += mn;
+[19]           }
+[20]       }

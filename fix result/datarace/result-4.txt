@@ -1,0 +1,21 @@
+ChangeLog:1@CustomerInfo.java
+FixDescription: Synchronize the deposit method to prevent data races when multiple threads modify the balance of an account.
+OriginalCode@9-13:
+[9]     public void deposit(int accountNumber, int amount){
+[10]         int temp = accounts[account[Number].getBalance();
+[11]         temp = temp + amount;
+[12]         accounts[accountNumber].setBalance(temp);
+[13]         System.out.println("deposit " + amount + "now " + accounts[accountNumber].getBalance());
+FixedCode@9-13:
+[9]     public synchronized void deposit(int accountNumber, int amount){
+[10]         int temp = accounts[accountNumber].getBalance();
+[11]         temp = temp + amount;
+[12]         accounts[accountNumber].setBalance(temp);
+[13]         System.out.println("deposit " + amount + "now " + accounts[accountNumber].getBalance());
+
+ChangeLog:2@Account.java
+FixDescription: Make the balance variable volatile to ensure visibility of changes across threads.
+OriginalCode@3-3:
+[3]     private int balance;
+FixedCode@3-3:
+[3]     private volatile int balance;

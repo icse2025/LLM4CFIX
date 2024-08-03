@@ -1,0 +1,61 @@
+ChangeLog:1@Person.java
+FixDescription: Synchronize access to shared variables in the Person class to prevent race conditions when multiple threads modify these variables.
+OriginalCode@27-28:
+[27]                if(wantsToEnter()){
+[28]                   building.peopleOutside--;
+FixedCode@27-28:
+[27]                if(wantsToEnter()){
+[28]                   synchronized(building) { building.peopleOutside--; }
+
+OriginalCode@38-39:
+[38]                      building.peopleWorking++;
+[39]                      activity = WORKING;
+FixedCode@38-39:
+[38]                      synchronized(building) { building.peopleWorking++; }
+[39]                      activity = WORKING;
+
+OriginalCode@54-55:
+[54]                   building.peopleTakingStairs--;
+[55]                   building.peopleWorking++;
+FixedCode@54-55:
+[54]                   synchronized(building) {
+[55]                       building.peopleTakingStairs--;
+[56]                       building.peopleWorking++;
+[57]                   }
+
+OriginalCode@73-74:
+[73]                      building.peopleTakingStairs++;
+[74]                      activity = TAKING_STAIRS;
+FixedCode@73-74:
+[73]                      synchronized(building) { building.peopleTakingStairs++; }
+[74]                      activity = TAKING_STAIRS;
+
+OriginalCode@89-90:
+[89]                      building.peopleOutside++;
+[90]                      building.peopleWorking--;
+FixedCode@89-90:
+[89]                      synchronized(building) {
+[90]                          building.peopleOutside++;
+[91]                          building.peopleWorking--;
+[92]                      }
+
+OriginalCode@99-100:
+[99]                         building.peopleWorking--;
+[100]                        activity = WAITING;
+FixedCode@99-100:
+[99]                         synchronized(building) { building.peopleWorking--; }
+[100]                        activity = WAITING;
+
+OriginalCode@114-115:
+[114]                      building.peopleWorking--;
+[115]                      activity = WAITING;
+FixedCode@114-115:
+[114]                      synchronized(building) { building.peopleWorking--; }
+[115]                      activity = WAITING;
+
+OriginalCode@120-121:
+[120]                      building.peopleWorking--;
+[121]                      activity = WAITING;
+FixedCode@120-121:
+[120]                      synchronized(building) { building.peopleWorking--; }
+[121]                      activity = WAITING;

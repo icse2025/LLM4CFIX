@@ -1,0 +1,13 @@
+ChangeLog:1@Bug.java
+FixDescription: Fix the atomicity violation and data race issues by synchronizing access to the shared variables `Num_Of_Seats_Sold` and `StopSales` to ensure that these operations are performed atomically and safely across multiple threads.
+OriginalCode@11-15:
+[11]         Num_Of_Seats_Sold++;                       
+[12]         if (Num_Of_Seats_Sold > Maximum_Capacity)  
+[13]             StopSales = true;                      
+[14]     }
+FixedCode@11-15:
+[11]         synchronized (this) {
+[12]             Num_Of_Seats_Sold++;                       
+[13]             if (Num_Of_Seats_Sold > Maximum_Capacity)  
+[14]                 StopSales = true;                      
+[15]         }

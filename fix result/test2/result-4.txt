@@ -1,0 +1,22 @@
+### ChangeLog:1@D.java
+FixDescription: Synchronize access to the shared mutable state variable `x` to prevent race conditions and ensure thread-safe updates when `m1` and `m2` are called concurrently by different threads.
+OriginalCode@3-9:
+```java
+[3]     int x = 0;
+[4]     void m1() {
+[5]         x++;
+[6]     }
+[7]     void m2() {
+[8]         x *= 2;
+[9]     }
+```
+FixedCode@3-9:
+```java
+[3]     int x = 0;
+[4]     synchronized void m1() {
+[5]         x++;
+[6]     }
+[7]     synchronized void m2() {
+[8]         x *= 2;
+[9]     }
+```

@@ -1,0 +1,2 @@
+diningPhiliosophers.DiningPhilosophers.main([Ljava/lang/String;)V
+diningPhiliosophers.Philosopher.run()V

@@ -1,0 +1,6 @@
+atmoerror.BankAccount.getTotal()I
+atmoerror.Customer.cost(I)V
+java.lang.Thread.start()V
+atmoerror.Main.main([Ljava/lang/String;)V
+atmoerror.Customer.run()V
+atmoerror.BankAccount.add(I)V

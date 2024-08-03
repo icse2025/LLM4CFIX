@@ -1,0 +1,33 @@
+### ChangeLog:1@EvenGenerator.java
+FixDescription: Ensured thread safety in `EvenGenerator` by synchronizing the `next()` method to prevent race conditions.
+
+OriginalCode@5-8:
+```java
+[5] 	public int next(){
+[6] 		++currentValue;
+[7] 		++currentValue;
+[8] 		return currentValue;
+```
+FixedCode@5-8:
+```java
+[5] 	public synchronized int next(){
+[6] 		++currentValue;
+[7] 		++currentValue;
+[8] 		return currentValue;
+```
+
+### ChangeLog:2@EvenChecker.java
+FixDescription: Fixed potential race condition by ensuring `generator` is properly initialized before use.
+
+OriginalCode@3-3:
+```java
+[3] 	private EvenGenerator generator;
+```
+FixedCode@3-3:
+```java
+[3] 	private final EvenGenerator generator;
+```
+
+### Summary:
+- Added `synchronized` to the `next()` method in `EvenGenerator` to ensure atomicity and prevent race conditions.
+- Made the `generator` in `EvenChecker` final to ensure it is properly initialized before being used by multiple threads.

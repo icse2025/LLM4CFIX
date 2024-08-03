@@ -1,0 +1,23 @@
+### ChangeLog:1@SetCheck2.java
+FixDescription: Ensure proper synchronization in the `SetCheck2` class to avoid data races and inconsistent state when setting values `a` and `b`.
+OriginalCode@5-13:
+```java
+[5]     void set(int i) {
+[6]     synchronized (this) {
+[7]     	a = i;
+[8]     	System.out.println("a set to " + i);
+[9]     }
+[10] 	synchronized (this) {
+[11] 		b = -i;
+[12] 		System.out.println("b set to " + -i);
+[13] 	}
+```
+FixedCode@5-13:
+```java
+[5]     synchronized void set(int i) {
+[6]     	a = i;
+[7]     	System.out.println("a set to " + i);
+[8]     	b = -i;
+[9]     	System.out.println("b set to " + -i);
+[10] }
+```

@@ -1,0 +1,31 @@
+ChangeLog:1@CustomerInfo.java
+FixDescription: Synchronize the deposit method to prevent concurrent modification of account balances which can lead to inconsistent states.
+OriginalCode@9-13:
+[9] 	public void deposit(int accountNumber, int amount){
+[10] 		int temp = accounts[accountNumber].getBalance();
+[11] 		temp = temp + amount;
+[12] 		accounts[accountNumber].setBalance(temp);
+[13] 		System.out.println("deposit " + amount + "now " + accounts[accountNumber].getBalance());
+FixedCode@9-13:
+[9] 	public synchronized void deposit(int accountNumber, int amount){
+[10] 		int temp = accounts[accountNumber].getBalance();
+[11] 		temp = temp + amount;
+[12] 		accounts[accountNumber].setBalance(temp);
+[13] 		System.out.println("deposit " + amount + "now " + accounts[accountNumber].getBalance());
+
+ChangeLog:2@Account.java
+FixDescription: Make the getBalance and setBalance methods of the Account class synchronized to ensure thread-safe access to the balance field.
+OriginalCode@4-9:
+[4] 	public int getBalance() {
+[5] 		return balance;
+[6] 	}
+[7] 	public void setBalance(int balance) {
+[8] 		this.balance = balance;
+[9] 	}
+FixedCode@4-9:
+[4] 	public synchronized int getBalance() {
+[5] 		return balance;
+[6] 	}
+[7] 	public synchronized void setBalance(int balance) {
+[8] 		this.balance = balance;
+[9] 	}
